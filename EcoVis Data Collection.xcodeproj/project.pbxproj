@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E2E51AC2CC2265600932E7B /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2E51AB2CC2265600932E7B /* CameraView.swift */; };
 		3E3948D92CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948D82CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift */; };
 		3E3948DB2CA5149F0068F225 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948DA2CA5149F0068F225 /* ContentView.swift */; };
 		3E3948DD2CA514A00068F225 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E3948DC2CA514A00068F225 /* Assets.xcassets */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3E2E51AB2CC2265600932E7B /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		3E3948D52CA5149F0068F225 /* EcoVis Data Collection.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "EcoVis Data Collection.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E3948D82CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoVis_Data_CollectionApp.swift; sourceTree = "<group>"; };
 		3E3948DA2CA5149F0068F225 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 			children = (
 				3E3948D82CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift */,
 				3E3948DA2CA5149F0068F225 /* ContentView.swift */,
+				3E2E51AB2CC2265600932E7B /* CameraView.swift */,
 				3E3948DC2CA514A00068F225 /* Assets.xcassets */,
 				3E3948DE2CA514A00068F225 /* Preview Content */,
 			);
@@ -257,6 +260,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E2E51AC2CC2265600932E7B /* CameraView.swift in Sources */,
 				3E3948DB2CA5149F0068F225 /* ContentView.swift in Sources */,
 				3E3948D92CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift in Sources */,
 			);
