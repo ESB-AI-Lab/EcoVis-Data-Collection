@@ -10,35 +10,59 @@ import SwiftUI
 struct ContentView: View {
     @State private var image: UIImage? = nil
     @State private var isShowingCamera = false
-    
+    @State private var borderColor: Color = .clear
+    //Body contains UI structure
     var body: some View {
-        VStack {
-            // Display the captured image or a placeholder if no image is available
-            if let image = image {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 300)
-            } else {
-                Image(systemName: "camera")
-                    .resizable()
-                    .frame(width: 100, height: 100)
-                    .foregroundColor(.gray)
-            }
+        ZStack {
+            // Apply the border as a background
+            Rectangle()
+                .stroke(borderColor, lineWidth: 20) // Draw the border
+                 
             
-            // Button to show the camera
-            Button("Take Picture") {
-                isShowingCamera = true
-            }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .sheet(isPresented: $isShowingCamera) {
-                CameraView(image: $image) // This shows the camera
+            
+            VStack {
+                // Display the captured image or a placeholder if no image is available
+                if let image = image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 300)
+                    
+                } else {
+                    Image(systemName: "camera")
+                        .resizable()
+                        .frame(width: 100, height: 100)
+                        .foregroundColor(.gray)
+                }
+                
+                // Button to show the camera
+                Button("Take Picture") {
+                    isShowingCamera = true
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .sheet(isPresented: $isShowingCamera) {
+                    CameraView(image: $image) // This shows the camera
+                }
+                
+                Button("Border") {
+                    toggleBorder()
+                }
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
         }
         .padding()
+    }
+    
+    
+    func toggleBorder() {
+        borderColor = (borderColor == .red) ? .green : .red
+        print("Border color changed to: \(borderColor)")
     }
 }
 
