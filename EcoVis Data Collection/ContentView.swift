@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var image: UIImage? = nil
     @State private var isShowingCamera = false
     @State private var borderColor: Color = .clear
+    let imageQualityChecker = ImageQualityChecker()
     //Body contains UI structure
     var body: some View {
         ZStack {
@@ -27,6 +28,10 @@ struct ContentView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(height: 300)
+                        //Call image quality check
+                        .onChange(of: image) { newImage in
+                            checkImageQuality(image: newImage) // Check quality when the image changes
+                        }
                     
                 } else {
                     Image(systemName: "camera")
@@ -46,23 +51,18 @@ struct ContentView: View {
                 .sheet(isPresented: $isShowingCamera) {
                     CameraView(image: $image) // This shows the camera
                 }
-                
-                Button("Border") {
-                    toggleBorder()
-                }
-                .padding()
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(10)
             }
         }
         .padding()
     }
     
+    func toggleBorder(isImageClear: Bool) {
+        borderColor = isImageClear ? .green : .red
+    }
     
-    func toggleBorder() {
-        borderColor = (borderColor == .red) ? .green : .red
-        print("Border color changed to: \(borderColor)")
+    func checkImageQuality(image: UIImage) {
+        let isImageClear = imageQualityChecker.performBlurrinessCheck(for: image)
+        toggleBorder(isImageClear: isImageClear)
     }
 }
 
