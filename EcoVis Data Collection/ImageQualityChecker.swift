@@ -17,7 +17,6 @@ class ImageQualityChecker {
         let context = CIContext(options: nil)
         
         let laplacianKernelString = """
-        // Define a kernel function that applies a Laplacian filter to an image
         kernel vec4 laplacian(sampler image) {
             // Get the current pixel coordinates (x, y) being processed
             vec2 d = destCoord();
@@ -72,5 +71,60 @@ class ImageQualityChecker {
         let mean = sum / Float(pixelCount)
         let variance = (sumOfSquares / Float(pixelCount)) - (mean * mean)
         return variance
+    }
+    
+    func calculateBrightness(for image: UIImage) -> CGFloat {
+        //We need to convert the image into raw pixel data to be iterated over.
+        guard let cgImage = image.cgImage else { return 0 }
+        
+        let width = cgImage.width
+        let height = cgImage.height
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bytesPerPixel = 4
+        let bytesPerRow = bytesPerPixel * width
+        let bitsPerComponent = 8
+        let rawData = UnsafeMutablePointer<UInt8>.allocate(capacity: width * height * bytesPerPixel)
+        defer { rawData.deallocate() }
+        
+        guard let context = CGContext(data: rawData,
+                                      width: width,
+                                      height: height,
+                                      bitsPerComponent: bitsPerComponent,
+                                      bytesPerRow: bytesPerRow,
+                                      space: colorSpace,
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+            return 0
+        }
+        
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
+        
+        var totalBrightness: CGFloat = 0
+        //Iterate over each pixel using nested loop with x and y coordinates
+        for y in 0..<height {
+            for x in 0..<width {
+                //Calculate the starting index of the pixel within the image data array
+                let pixelIndex = (y * width + x) * bytesPerPixel
+                //Take the RGB values from each pixel 0-255
+                let red = CGFloat(rawData[pixelIndex])
+                let green = CGFloat(rawData[pixelIndex + 1])
+                let blue = CGFloat(rawData[pixelIndex + 2])
+                //Apply the brightness formula by taking the average color intensity
+                let brightness = (red + green + blue) / 3.0
+                //Add the pixel's brightness to the total brightness
+                totalBrightness += brightness
+            }
+        }
+        //Divide by the number of pixels to find the average brightness
+        let averageBrightness = totalBrightness / CGFloat(width * height)
+        return averageBrightness
+        
+    }
+    
+    func consistentBrightness(image1: UIImage, image2: UIImage, tolerance: CGFloat = 10.0) -> Bool {
+        let brightness1 = calculateBrightness(for: image1)
+        let brightness2 = calculateBrightness(for: image2)
+        //Absolute value of the brightness level difference
+        let difference = abs(brightness1 - brightness2)
+        return difference <= tolerance
     }
 }
