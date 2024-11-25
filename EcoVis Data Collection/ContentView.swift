@@ -61,7 +61,7 @@ struct ContentView: View {
                 
                 if firstImage != nil && secondImage != nil {
                     Button("Check Quality") {
-                        
+                        checkImageQuality()
                     }
                     .padding()
                     .background(Color.red)
@@ -78,7 +78,7 @@ struct ContentView: View {
         borderColor = isImageClear ? .green : .red
     }
     
-    func checkImageQuality(image: UIImage) {
+    func checkImageQuality() {
         guard let first = firstImage, let second = secondImage else { return }
         
         let isBrightnessConsistent = imageQualityChecker.consistentBrightness(image1: first, image2: second)
