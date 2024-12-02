@@ -8,7 +8,7 @@ import UIKit
 import CoreImage
 
 class ImageQualityChecker {
-    private let blurThreshold: Float = 1000.0 //Needs testing
+    private let blurThreshold: Float = 780.0 //Needs testing
     
     func performBlurrinessCheck(for image: UIImage) -> Bool{
         guard let cgImage = image.cgImage else { return false }
@@ -36,10 +36,10 @@ class ImageQualityChecker {
 
                
                // Create the Laplacian kernel
-               guard let laplacianKernel = CIColorKernel(source: laplacianKernelString) else { return false }
+               guard let laplacianKernel = CIKernel(source: laplacianKernelString) else { return false }
                
                // Apply the kernel to the image
-               guard let outputImage = laplacianKernel.apply(extent: ciImage.extent, arguments: [ciImage]) else {
+        guard let outputImage = laplacianKernel.apply(extent: ciImage.extent, roiCallback: {_, rect in rect }, arguments: [ciImage]) else {
                    return false
                }
                
@@ -120,11 +120,15 @@ class ImageQualityChecker {
         
     }
     
-    func consistentBrightness(image1: UIImage, image2: UIImage, tolerance: CGFloat = 10.0) -> Bool {
+    func consistentBrightness(image1: UIImage, image2: UIImage, tolerance: CGFloat = 10.0) -> (isConsistent: Bool, isExposureGood1: Bool, isExposureGood2: Bool) {
         let brightness1 = calculateBrightness(for: image1)
         let brightness2 = calculateBrightness(for: image2)
         //Absolute value of the brightness level difference
         let difference = abs(brightness1 - brightness2)
-        return difference <= tolerance
+        
+        let isConsistent = difference <= tolerance
+        let isExposureGood1 = (10 <= brightness1 && brightness1 <= 245)
+        let isExposureGood2 = (10 <= brightness2 && brightness2 <= 245)
+        return (isConsistent, isExposureGood1, isExposureGood2)
     }
 }

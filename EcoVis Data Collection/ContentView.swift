@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var isShowingCamera = false
     @State private var borderColor: Color = .clear
     @State private var isCapturingFirstImage = true
+    @State private var feedbackMessage = ""
     let imageQualityChecker = ImageQualityChecker()
     //Body contains UI structure
     var body: some View {
@@ -68,6 +69,11 @@ struct ContentView: View {
                     .foregroundColor(.white)
                     .cornerRadius(5)
                 }
+                if !feedbackMessage.isEmpty {
+                    Text(feedbackMessage)
+                        .foregroundColor(.red)
+                        .padding()
+                }
                 
             }
         }
@@ -81,14 +87,33 @@ struct ContentView: View {
     func checkImageQuality() {
         guard let first = firstImage, let second = secondImage else { return }
         
-        let isBrightnessConsistent = imageQualityChecker.consistentBrightness(image1: first, image2: second)
+        let brightnessCheckResult = imageQualityChecker.consistentBrightness(image1: first, image2: second)
         let isFirstClear = imageQualityChecker.performBlurrinessCheck(for: first)
         let isSecondClear = imageQualityChecker.performBlurrinessCheck(for: second)
         
-        if isBrightnessConsistent && isFirstClear && isSecondClear {
+        if brightnessCheckResult.isConsistent && brightnessCheckResult.isExposureGood1 && brightnessCheckResult.isExposureGood2 && isFirstClear && isSecondClear {
             toggleBorder(isImageClear: true)
-        } else {
+        } 
+        else {
             toggleBorder(isImageClear: false)
+            var reasons: [String] = []
+            if !brightnessCheckResult.isConsistent {
+                reasons.append("Brightness is inconsistent between the two images.")
+            }
+            if !brightnessCheckResult.isExposureGood1 {
+                reasons.append("First image has poor exposure")
+            }
+            if !brightnessCheckResult.isExposureGood2 {
+                reasons.append("Second image has poor exposure")
+            }
+            if !isFirstClear {
+                reasons.append("The first image is blurry.")
+            }
+            if !isSecondClear {
+                reasons.append("The second image is blurry.")
+            }
+            
+            feedbackMessage = "Quality check failed: " + reasons.joined(separator: " ")
         }
     }
     
