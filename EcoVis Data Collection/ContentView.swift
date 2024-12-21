@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import ClerkSDK
 
 struct ContentView: View {
+    @ObservedObject private var clerk = Clerk.shared
     @State private var firstImage: UIImage? = nil
     @State private var secondImage: UIImage? = nil
     @State private var isShowingCamera = false
@@ -15,69 +17,82 @@ struct ContentView: View {
     @State private var isCapturingFirstImage = true
     @State private var feedbackMessage = ""
     let imageQualityChecker = ImageQualityChecker()
-    //Body contains UI structure
+
     var body: some View {
-        ZStack {
-            // Apply the border as a background
-            Rectangle()
-                .stroke(borderColor, lineWidth: 20) // Draw the border
-        
-            VStack {
-                // Display the captured image or a placeholder if no image is available
-                HStack {
-                    //Capture first image
-                    if let firstImage = firstImage {
-                        Image(uiImage: firstImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 150)
-                        
-                    } 
-                    else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .frame(width: 100, height: 100)
-                            .foregroundColor(.gray)
-                    }
-                    //Capture Second image
-                    if let secondImage = secondImage {
-                        Image(uiImage: secondImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 150)
-                    }
-                }
+        VStack {
+            if let user = clerk.user {
+                // Show main app content when the user is signed in
+                ZStack {
+                    // Apply the border as a background
+                    Rectangle()
+                        .stroke(borderColor, lineWidth: 20) // Draw the border
                 
-                // Button to show the camera
-                Button(isCapturingFirstImage ? "Capture First Image" : "Capture Second image") {
-                    isShowingCamera = true
+                    VStack {
+                        // Display the captured image or a placeholder if no image is available
+                        HStack {
+                            // Capture first image
+                            if let firstImage = firstImage {
+                                Image(uiImage: firstImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 150)
+                            } else {
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .frame(width: 100, height: 100)
+                                    .foregroundColor(.gray)
+                            }
+                            // Capture Second image
+                            if let secondImage = secondImage {
+                                Image(uiImage: secondImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 150)
+                            }
+                        }
+                        
+                        // Button to show the camera
+                        Button(isCapturingFirstImage ? "Capture First Image" : "Capture Second image") {
+                            isShowingCamera = true
+                        }
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .sheet(isPresented: $isShowingCamera) {
+                            CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage) // This shows the camera
+                        }
+                        
+                        if firstImage != nil && secondImage != nil {
+                            Button("Check Quality") {
+                                checkImageQuality()
+                            }
+                            .padding()
+                            .background(Color.red)
+                            .foregroundColor(.white)
+                            .cornerRadius(5)
+                        }
+                        if !feedbackMessage.isEmpty {
+                            Text(feedbackMessage)
+                                .foregroundColor(.red)
+                                .padding()
+                        }
+                        
+                        Button("Sign Out") {
+                            Task { try? await clerk.signOut() }
+                        }
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.red)
+                        .cornerRadius(10)
+                    }
                 }
                 .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-                .sheet(isPresented: $isShowingCamera) {
-                    CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage) // This shows the camera
-                }
-                
-                if firstImage != nil && secondImage != nil {
-                    Button("Check Quality") {
-                        checkImageQuality()
-                    }
-                    .padding()
-                    .background(Color.red)
-                    .foregroundColor(.white)
-                    .cornerRadius(5)
-                }
-                if !feedbackMessage.isEmpty {
-                    Text(feedbackMessage)
-                        .foregroundColor(.red)
-                        .padding()
-                }
-                
+            } else {
+                // Show SignUpOrSignInView when the user is signed out
+                SignUpOrSignInView()
             }
         }
-        .padding()
     }
     
     func toggleBorder(isImageClear: Bool) {
@@ -93,8 +108,7 @@ struct ContentView: View {
         
         if brightnessCheckResult.isConsistent && brightnessCheckResult.isExposureGood1 && brightnessCheckResult.isExposureGood2 && isFirstClear && isSecondClear {
             toggleBorder(isImageClear: true)
-        } 
-        else {
+        } else {
             toggleBorder(isImageClear: false)
             var reasons: [String] = []
             if !brightnessCheckResult.isConsistent {
@@ -125,4 +139,3 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
-
