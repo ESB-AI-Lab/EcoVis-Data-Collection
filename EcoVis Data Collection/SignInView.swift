@@ -14,7 +14,7 @@ struct SignInView: View {
     @State private var feedbackMessage = ""
 
     var body: some View {
-        VStack(spacing: 20) { // Add spacing between elements
+        VStack(spacing: 20) { 
             Text("Sign In")
                 .font(.title)
             
