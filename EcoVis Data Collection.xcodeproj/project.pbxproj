@@ -16,6 +16,8 @@
 		3E3948EA2CA514A00068F225 /* EcoVis_Data_CollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948E92CA514A00068F225 /* EcoVis_Data_CollectionTests.swift */; };
 		3E3948F42CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948F32CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift */; };
 		3E3948F62CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */; };
+		565F31822D2026C100EE1718 /* ImageOverlapChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565F317C2D20221100EE1718 /* ImageOverlapChecker.swift */; };
+		565F31832D2026C100EE1718 /* ImageOverlapTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565F317E2D20237200EE1718 /* ImageOverlapTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		3E3948EF2CA514A00068F225 /* EcoVis Data CollectionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "EcoVis Data CollectionUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E3948F32CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoVis_Data_CollectionUITests.swift; sourceTree = "<group>"; };
 		3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoVis_Data_CollectionUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		565F317C2D20221100EE1718 /* ImageOverlapChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlapChecker.swift; sourceTree = "<group>"; };
+		565F317E2D20237200EE1718 /* ImageOverlapTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlapTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +103,8 @@
 		3E3948D72CA5149F0068F225 /* EcoVis Data Collection */ = {
 			isa = PBXGroup;
 			children = (
+				565F317C2D20221100EE1718 /* ImageOverlapChecker.swift */,
+				565F317E2D20237200EE1718 /* ImageOverlapTest.swift */,
 				3E2A51122CD8A43900AD3CAF /* EcoVis-Data-Collection-Info.plist */,
 				3E3948D82CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift */,
 				3E3948DA2CA5149F0068F225 /* ContentView.swift */,
@@ -269,6 +275,8 @@
 				3E2A51142CD8AA0200AD3CAF /* ImageQualityChecker.swift in Sources */,
 				3E3948DB2CA5149F0068F225 /* ContentView.swift in Sources */,
 				3E3948D92CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift in Sources */,
+				565F31822D2026C100EE1718 /* ImageOverlapChecker.swift in Sources */,
+				565F31832D2026C100EE1718 /* ImageOverlapTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,6 +440,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"EcoVis Data Collection/Preview Content\"";
+				DEVELOPMENT_TEAM = 7T6WB79TS3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "EcoVis-Data-Collection-Info.plist";
@@ -464,6 +473,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"EcoVis Data Collection/Preview Content\"";
+				DEVELOPMENT_TEAM = 7T6WB79TS3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "EcoVis-Data-Collection-Info.plist";
