@@ -2,12 +2,15 @@
 //  ContentView.swift
 //  EcoVis Data Collection
 //
-//  Created by Kan on 9/25/24.
+//  Created by Kanishka on 9/25/24.
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var locationManager = LocationManager()
+    private var motionManager = MotionManager()
+    
     @State private var firstImage: UIImage? = nil
     @State private var secondImage: UIImage? = nil
     @State private var isShowingCamera = false
@@ -90,8 +93,10 @@ struct ContentView: View {
         let brightnessCheckResult = imageQualityChecker.consistentBrightness(image1: first, image2: second)
         let isFirstClear = imageQualityChecker.performBlurrinessCheck(for: first)
         let isSecondClear = imageQualityChecker.performBlurrinessCheck(for: second)
+        let firstWhiteBalance = imageQualityChecker.checkWhiteBalance(for: first)
+        let secondWhiteBalance = imageQualityChecker.checkWhiteBalance(for: second)
         
-        if brightnessCheckResult.isConsistent && brightnessCheckResult.isExposureGood1 && brightnessCheckResult.isExposureGood2 && isFirstClear && isSecondClear {
+        if brightnessCheckResult.isConsistent && brightnessCheckResult.isExposureGood1 && brightnessCheckResult.isExposureGood2 && isFirstClear && isSecondClear && firstWhiteBalance && secondWhiteBalance{
             toggleBorder(isImageClear: true)
         } 
         else {
@@ -112,6 +117,12 @@ struct ContentView: View {
             if !isSecondClear {
                 reasons.append("The second image is blurry.")
             }
+            if !firstWhiteBalance {
+                reasons.append("First image has poor white balance")
+            }
+            if !secondWhiteBalance {
+                reasons.append("Second image has poor white balance")
+            }
             
             feedbackMessage = "Quality check failed: " + reasons.joined(separator: " ")
         }
@@ -121,6 +132,7 @@ struct ContentView: View {
         guard let first = firstImage, let second = secondImage else { return }
     }
 }
+
 
 #Preview {
     ContentView()

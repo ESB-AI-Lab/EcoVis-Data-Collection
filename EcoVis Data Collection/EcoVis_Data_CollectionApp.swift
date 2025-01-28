@@ -2,7 +2,7 @@
 //  EcoVis_Data_CollectionApp.swift
 //  EcoVis Data Collection
 //
-//  Created by Kan on 9/25/24.
+//  Created by Kanishka on 9/25/24.
 //
 
 import SwiftUI

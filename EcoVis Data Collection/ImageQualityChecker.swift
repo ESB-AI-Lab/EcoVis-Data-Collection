@@ -2,7 +2,7 @@
 //  ImageQualityChecker.swift
 //  EcoVis Data Collection
 //
-//  Created by Kan on 11/3/24.
+//  Created by Kanishka on 11/3/24.
 //
 import UIKit
 import CoreImage
@@ -75,29 +75,11 @@ class ImageQualityChecker {
     
     func calculateBrightness(for image: UIImage) -> CGFloat {
         //We need to convert the image into raw pixel data to be iterated over.
-        guard let cgImage = image.cgImage else { return 0 }
+        guard let rawData = extractPixelData(from: image) else { return 0 }
         
-        let width = cgImage.width
-        let height = cgImage.height
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let width = image.cgImage!.width
+        let height = image.cgImage!.height
         let bytesPerPixel = 4
-        let bytesPerRow = bytesPerPixel * width
-        let bitsPerComponent = 8
-        let rawData = UnsafeMutablePointer<UInt8>.allocate(capacity: width * height * bytesPerPixel)
-        defer { rawData.deallocate() }
-        
-        guard let context = CGContext(data: rawData,
-                                      width: width,
-                                      height: height,
-                                      bitsPerComponent: bitsPerComponent,
-                                      bytesPerRow: bytesPerRow,
-                                      space: colorSpace,
-                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
-            return 0
-        }
-        
-        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
-        
         var totalBrightness: CGFloat = 0
         //Iterate over each pixel using nested loop with x and y coordinates
         for y in 0..<height {
@@ -117,7 +99,6 @@ class ImageQualityChecker {
         //Divide by the number of pixels to find the average brightness
         let averageBrightness = totalBrightness / CGFloat(width * height)
         return averageBrightness
-        
     }
     
     func consistentBrightness(image1: UIImage, image2: UIImage, tolerance: CGFloat = 10.0) -> (isConsistent: Bool, isExposureGood1: Bool, isExposureGood2: Bool) {
@@ -131,4 +112,67 @@ class ImageQualityChecker {
         let isExposureGood2 = (10 <= brightness2 && brightness2 <= 245)
         return (isConsistent, isExposureGood1, isExposureGood2)
     }
+    
+    func checkWhiteBalance(for image: UIImage) -> Bool {
+        guard let rawData = extractPixelData(from: image) else { return false }
+        
+        let width = image.cgImage!.width
+        let height = image.cgImage!.height
+        let bytesPerPixel = 4
+        var totalRed: CGFloat = 0
+        var totalGreen: CGFloat = 0
+        var totalBlue: CGFloat = 0
+        let pixelCount = width * height
+
+        for y in 0..<height {
+            for x in 0..<width {
+                let pixelIndex = (y * width + x) * bytesPerPixel
+                let red = CGFloat(rawData[pixelIndex])
+                let green = CGFloat(rawData[pixelIndex + 1])
+                let blue = CGFloat(rawData[pixelIndex + 2])
+                
+                totalRed += red
+                totalGreen += green
+                totalBlue += blue
+            }
+        }
+
+        let avgRed = totalRed / CGFloat(pixelCount)
+        let avgGreen = totalGreen / CGFloat(pixelCount)
+        let avgBlue = totalBlue / CGFloat(pixelCount)
+
+        let redGreenDiff = abs(avgRed - avgGreen)
+        let redBlueDiff = abs(avgRed - avgBlue)
+        let greenBlueDiff = abs(avgGreen - avgBlue)
+
+        let tolerance: CGFloat = 15.0 // Adjust as needed
+        return redGreenDiff <= tolerance && redBlueDiff <= tolerance && greenBlueDiff <= tolerance
+    }
+    
+    private func extractPixelData(from image: UIImage) -> UnsafeMutablePointer<UInt8>? {
+        guard let cgImage = image.cgImage else { return nil }
+        
+        let width = cgImage.width
+        let height = cgImage.height
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bytesPerPixel = 4
+        let bytesPerRow = bytesPerPixel * width
+        let bitsPerComponent = 8
+        let rawData = UnsafeMutablePointer<UInt8>.allocate(capacity: width * height * bytesPerPixel)
+        
+        guard let context = CGContext(data: rawData,
+                                      width: width,
+                                      height: height,
+                                      bitsPerComponent: bitsPerComponent,
+                                      bytesPerRow: bytesPerRow,
+                                      space: colorSpace,
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+            rawData.deallocate()
+            return nil
+        }
+        
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
+        return rawData
+    }
 }
+
