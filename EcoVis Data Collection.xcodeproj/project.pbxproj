@@ -440,7 +440,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"EcoVis Data Collection/Preview Content\"";
-				DEVELOPMENT_TEAM = 7T6WB79TS3;
+				DEVELOPMENT_TEAM = 54P48ST2S6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "EcoVis-Data-Collection-Info.plist";
@@ -473,7 +473,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"EcoVis Data Collection/Preview Content\"";
-				DEVELOPMENT_TEAM = 7T6WB79TS3;
+				DEVELOPMENT_TEAM = 54P48ST2S6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "EcoVis-Data-Collection-Info.plist";

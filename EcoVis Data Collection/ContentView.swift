@@ -4,6 +4,7 @@
 //
 //  Created by Kan on 9/25/24.
 //
+//
 
 import SwiftUI
 
@@ -11,45 +12,50 @@ struct ContentView: View {
     @State private var firstImage: UIImage? = nil
     @State private var secondImage: UIImage? = nil
     @State private var isShowingCamera = false
-    @State private var borderColor: Color = .clear
     @State private var isCapturingFirstImage = true
     @State private var feedbackMessage = ""
-    let imageQualityChecker = ImageQualityChecker()
-    //Body contains UI structure
+    @State private var borderColor: Color = .clear
+
+    let imageOverlapChecker = ImageOverlapChecker()
+
     var body: some View {
         ZStack {
             // Apply the border as a background
             Rectangle()
                 .stroke(borderColor, lineWidth: 20) // Draw the border
-        
-            VStack {
-                // Display the captured image or a placeholder if no image is available
+            
+            VStack(spacing: 20) {
+                // Display the captured images or placeholders
                 HStack {
-                    //Capture first image
+                    // First image
                     if let firstImage = firstImage {
                         Image(uiImage: firstImage)
                             .resizable()
                             .scaledToFit()
                             .frame(height: 150)
-                        
-                    } 
-                    else {
+                    } else {
                         Image(systemName: "photo")
                             .resizable()
                             .frame(width: 100, height: 100)
                             .foregroundColor(.gray)
                     }
-                    //Capture Second image
+                    
+                    // Second image
                     if let secondImage = secondImage {
                         Image(uiImage: secondImage)
                             .resizable()
                             .scaledToFit()
                             .frame(height: 150)
+                    } else {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .frame(width: 100, height: 100)
+                            .foregroundColor(.gray)
                     }
                 }
-                
-                // Button to show the camera
-                Button(isCapturingFirstImage ? "Capture First Image" : "Capture Second image") {
+
+                // Button to capture the images
+                Button(isCapturingFirstImage ? "Capture First Image" : "Capture Second Image") {
                     isShowingCamera = true
                 }
                 .padding()
@@ -57,72 +63,47 @@ struct ContentView: View {
                 .foregroundColor(.white)
                 .cornerRadius(10)
                 .sheet(isPresented: $isShowingCamera) {
-                    CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage) // This shows the camera
+                    CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage)
+                        .onDisappear {
+                            // Move to the next step after capturing the first image
+                            if firstImage != nil && isCapturingFirstImage {
+                                isCapturingFirstImage = false
+                            }
+                        }
                 }
-                
+
+                // Check overlap if both images are captured
                 if firstImage != nil && secondImage != nil {
-                    Button("Check Quality") {
-                        checkImageQuality()
+                    Button("Check Overlap") {
+                        checkImageOverlap()
                     }
                     .padding()
-                    .background(Color.red)
+                    .background(Color.green)
                     .foregroundColor(.white)
-                    .cornerRadius(5)
+                    .cornerRadius(10)
                 }
+
+                // Show feedback message
                 if !feedbackMessage.isEmpty {
                     Text(feedbackMessage)
-                        .foregroundColor(.red)
+                        .foregroundColor(borderColor == .green ? .green : .red)
                         .padding()
                 }
-                
             }
-        }
-        .padding()
-    }
-    
-    func toggleBorder(isImageClear: Bool) {
-        borderColor = isImageClear ? .green : .red
-    }
-    
-    func checkImageQuality() {
-        guard let first = firstImage, let second = secondImage else { return }
-        
-        let brightnessCheckResult = imageQualityChecker.consistentBrightness(image1: first, image2: second)
-        let isFirstClear = imageQualityChecker.performBlurrinessCheck(for: first)
-        let isSecondClear = imageQualityChecker.performBlurrinessCheck(for: second)
-        
-        if brightnessCheckResult.isConsistent && brightnessCheckResult.isExposureGood1 && brightnessCheckResult.isExposureGood2 && isFirstClear && isSecondClear {
-            toggleBorder(isImageClear: true)
-        } 
-        else {
-            toggleBorder(isImageClear: false)
-            var reasons: [String] = []
-            if !brightnessCheckResult.isConsistent {
-                reasons.append("Brightness is inconsistent between the two images.")
-            }
-            if !brightnessCheckResult.isExposureGood1 {
-                reasons.append("First image has poor exposure")
-            }
-            if !brightnessCheckResult.isExposureGood2 {
-                reasons.append("Second image has poor exposure")
-            }
-            if !isFirstClear {
-                reasons.append("The first image is blurry.")
-            }
-            if !isSecondClear {
-                reasons.append("The second image is blurry.")
-            }
-            
-            feedbackMessage = "Quality check failed: " + reasons.joined(separator: " ")
+            .padding()
         }
     }
     
-    func createOverlay() {
-        guard let first = firstImage, let second = secondImage else { return }
+    func checkImageOverlap() {
+        guard let firstImage = firstImage, let secondImage = secondImage else { return }
+
+        let overlapDetected = imageOverlapChecker.checkImageOverlap(firstImage, secondImage)
+        if overlapDetected {
+            feedbackMessage = "The images overlap!"
+            borderColor = .green
+        } else {
+            feedbackMessage = "No overlap detected."
+            borderColor = .red
+        }
     }
 }
-
-#Preview {
-    ContentView()
-}
-

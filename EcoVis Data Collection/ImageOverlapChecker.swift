@@ -5,13 +5,14 @@
 //  Created by Vats Narsaria on 12/28/24.
 //
 
-
 import Accelerate
 import UIKit
 
 class ImageOverlapChecker {
+    
     internal func checkImageOverlap(_ image1: UIImage, _ image2: UIImage) -> Bool {
         guard image1.size == image2.size else {
+            print("Image sizes do not match: \(image1.size) vs \(image2.size)")
             return false
         }
         
@@ -23,6 +24,7 @@ class ImageOverlapChecker {
             let data1 = getGrayscaleData(from: image1),
             let data2 = getGrayscaleData(from: image2)
         else {
+            print("Failed to extract grayscale data from one or both images.")
             return false
         }
         
@@ -34,9 +36,11 @@ class ImageOverlapChecker {
         
         // Compare the extracted regions
         if let similarity = compareImageRegions(rightHalf1, leftHalf2, width: halfWidth, height: height) {
+            print("Final Similarity Score: \(similarity)")
             return similarity > 0.8  // Overlap if similarity is above 80%
         }
         
+        print("Region comparison failed.")
         return false
     }
     
@@ -50,37 +54,51 @@ class ImageOverlapChecker {
             region.append(contentsOf: data[startIndex..<endIndex])
         }
         
+        print("Region extracted successfully. Size: \(region.count)")
         return region
     }
     
     // Compare two image regions
     func compareImageRegions(_ region1: [UInt8], _ region2: [UInt8], width: Int, height: Int) -> Double? {
         guard region1.count == region2.count else {
+            print("Region sizes do not match: \(region1.count) vs \(region2.count)")
             return nil
         }
-        //Initizialize variables
+        
+        // Convert regions to float arrays
         var floatData1 = [Float](repeating: 0, count: width * height)
         var floatData2 = [Float](repeating: 0, count: width * height)
-        var resultData = [Float](repeating: 0, count: width * height)
-        
-        //Convert to float
         vDSP.convertElements(of: region1, to: &floatData1)
         vDSP.convertElements(of: region2, to: &floatData2)
         
-        //Calculate absolute difference for each pixel
+        // Normalize pixel values to [0, 1]
+        vDSP.divide(floatData1, 255.0, result: &floatData1)
+        vDSP.divide(floatData2, 255.0, result: &floatData2)
+        
+        // Calculate absolute differences
+        var resultData = [Float](repeating: 0, count: width * height)
         vDSP.subtract(floatData2, floatData1, result: &resultData)
         vDSP.absolute(resultData, result: &resultData)
         
+        // Calculate similarity
         let sum: Float = vDSP.sum(resultData)
-        let ratio = Double(sum) / Double(width * height)
-        let similarity = 1 - ratio
+        let totalPixels = width * height
+        let averageDifference = Double(sum) / Double(totalPixels)
+        let similarity = 1 - averageDifference  // Similarity decreases as difference increases
+
+        // Debugging
+        print("Sum of Differences: \(sum)")
+        print("Average Difference Ratio: \(averageDifference)")
+        print("Similarity Score: \(similarity)")
         
         return similarity
     }
+
     
     // Convert UIImage to grayscale data
     func getGrayscaleData(from image: UIImage) -> [UInt8]? {
         guard let cgImage = image.cgImage else {
+            print("Failed to get CGImage from UIImage.")
             return nil
         }
         
@@ -103,14 +121,15 @@ class ImageOverlapChecker {
             space: colorSpace,
             bitmapInfo: bitmapInfo
         ) else {
+            print("Failed to create CGContext.")
             return nil
         }
         
         let rect = CGRect(x: 0, y: 0, width: width, height: height)
         context.draw(cgImage, in: rect)
         
+        print("Grayscale data extracted successfully. Size: \(imageData.count)")
         return imageData
     }
-    
-    
 }
+
