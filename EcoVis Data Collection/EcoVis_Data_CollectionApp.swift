@@ -6,12 +6,24 @@
 //
 
 import SwiftUI
+import ClerkSDK
 
 @main
 struct EcoVis_Data_CollectionApp: App {
+    @ObservedObject private var clerk = Clerk.shared
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ZStack {
+                    if clerk.loadingState == .notLoaded {
+                      ProgressView()
+                    } else {
+                      ContentView()
+                    }
+                  }
+                  .task {
+                    clerk.configure(publishableKey: "pk_test_am9pbnQtcGVhY29jay02OC5jbGVyay5hY2NvdW50cy5kZXYk")
+                    try? await clerk.load()
+                  }
         }
     }
 }

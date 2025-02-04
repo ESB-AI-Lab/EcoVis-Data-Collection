@@ -17,6 +17,12 @@
 		3E3948EA2CA514A00068F225 /* EcoVis_Data_CollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948E92CA514A00068F225 /* EcoVis_Data_CollectionTests.swift */; };
 		3E3948F42CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948F32CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift */; };
 		3E3948F62CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */; };
+		5FE27CAD2D16CBA900FAC8A5 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE27CAC2D16CBA500FAC8A5 /* SignUpView.swift */; };
+		5FE27CAF2D16CBBD00FAC8A5 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE27CAE2D16CBBB00FAC8A5 /* SignInView.swift */; };
+		5FE27CB12D16CBCE00FAC8A5 /* SignUpOrSignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE27CB02D16CBC800FAC8A5 /* SignUpOrSignInView.swift */; };
+		5FE27CB42D16CD4900FAC8A5 /* ClerkSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5FE27CB32D16CD4900FAC8A5 /* ClerkSDK */; };
+		5FE27CB62D16CD5500FAC8A5 /* ClerkSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5FE27CB52D16CD5500FAC8A5 /* ClerkSDK */; };
+		5FE27CB82D16CD5A00FAC8A5 /* ClerkSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5FE27CB72D16CD5A00FAC8A5 /* ClerkSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +57,10 @@
 		3E3948EF2CA514A00068F225 /* EcoVis Data CollectionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "EcoVis Data CollectionUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E3948F32CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoVis_Data_CollectionUITests.swift; sourceTree = "<group>"; };
 		3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoVis_Data_CollectionUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		5FA9FD952D16C7CB007A75DB /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		5FE27CAC2D16CBA500FAC8A5 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		5FE27CAE2D16CBBB00FAC8A5 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		5FE27CB02D16CBC800FAC8A5 /* SignUpOrSignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpOrSignInView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE27CB42D16CD4900FAC8A5 /* ClerkSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE27CB62D16CD5500FAC8A5 /* ClerkSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE27CB82D16CD5A00FAC8A5 /* ClerkSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,9 +94,11 @@
 		3E3948CC2CA5149F0068F225 = {
 			isa = PBXGroup;
 			children = (
+				5FA9FD952D16C7CB007A75DB /* .gitignore */,
 				3E3948D72CA5149F0068F225 /* EcoVis Data Collection */,
 				3E3948E82CA514A00068F225 /* EcoVis Data CollectionTests */,
 				3E3948F22CA514A00068F225 /* EcoVis Data CollectionUITests */,
+				5FE27CB22D16CD4100FAC8A5 /* Frameworks */,
 				3E3948D62CA5149F0068F225 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -101,6 +116,9 @@
 		3E3948D72CA5149F0068F225 /* EcoVis Data Collection */ = {
 			isa = PBXGroup;
 			children = (
+				5FE27CB02D16CBC800FAC8A5 /* SignUpOrSignInView.swift */,
+				5FE27CAE2D16CBBB00FAC8A5 /* SignInView.swift */,
+				5FE27CAC2D16CBA500FAC8A5 /* SignUpView.swift */,
 				3E2A51122CD8A43900AD3CAF /* EcoVis-Data-Collection-Info.plist */,
 				3E3948D82CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift */,
 				3E3948DA2CA5149F0068F225 /* ContentView.swift */,
@@ -136,6 +154,13 @@
 				3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */,
 			);
 			path = "EcoVis Data CollectionUITests";
+			sourceTree = "<group>";
+		};
+		5FE27CB22D16CD4100FAC8A5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -226,6 +251,9 @@
 				Base,
 			);
 			mainGroup = 3E3948CC2CA5149F0068F225;
+			packageReferences = (
+				5FA9FD962D16C990007A75DB /* XCRemoteSwiftPackageReference "clerk-ios" */,
+			);
 			productRefGroup = 3E3948D62CA5149F0068F225 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -268,8 +296,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE27CAF2D16CBBD00FAC8A5 /* SignInView.swift in Sources */,
 				3E2E51AC2CC2265600932E7B /* CameraView.swift in Sources */,
+				5FE27CAD2D16CBA900FAC8A5 /* SignUpView.swift in Sources */,
 				3E2A51142CD8AA0200AD3CAF /* ImageQualityChecker.swift in Sources */,
+				5FE27CB12D16CBCE00FAC8A5 /* SignUpOrSignInView.swift in Sources */,
 				3E3948DB2CA5149F0068F225 /* ContentView.swift in Sources */,
 				3E3948D92CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift in Sources */,
 				3E18D9242D3F692800467746 /* DataHandler.swift in Sources */,
@@ -606,6 +637,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5FA9FD962D16C990007A75DB /* XCRemoteSwiftPackageReference "clerk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/clerk/clerk-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.39.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5FE27CB32D16CD4900FAC8A5 /* ClerkSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5FA9FD962D16C990007A75DB /* XCRemoteSwiftPackageReference "clerk-ios" */;
+			productName = ClerkSDK;
+		};
+		5FE27CB52D16CD5500FAC8A5 /* ClerkSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5FA9FD962D16C990007A75DB /* XCRemoteSwiftPackageReference "clerk-ios" */;
+			productName = ClerkSDK;
+		};
+		5FE27CB72D16CD5A00FAC8A5 /* ClerkSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5FA9FD962D16C990007A75DB /* XCRemoteSwiftPackageReference "clerk-ios" */;
+			productName = ClerkSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3E3948CD2CA5149F0068F225 /* Project object */;
 }
