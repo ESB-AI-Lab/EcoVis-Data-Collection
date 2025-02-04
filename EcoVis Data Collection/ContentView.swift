@@ -20,7 +20,7 @@ struct ContentView: View {
     @State private var isCapturingFirstImage = true
     @State private var feedbackMessage = ""
     let imageQualityChecker = ImageQualityChecker()
-
+    
     var body: some View {
         VStack {
             if let user = clerk.user {
@@ -29,7 +29,7 @@ struct ContentView: View {
                     // Apply the border as a background
                     Rectangle()
                         .stroke(borderColor, lineWidth: 20) // Draw the border
-                
+                    
                     VStack {
                         // Display the captured image or a placeholder if no image is available
                         HStack {
@@ -96,58 +96,62 @@ struct ContentView: View {
                 SignUpOrSignInView()
             }
         }
+        .onAppear {
+            locationManager.startUpdating() // This will start location updates when the view appears
+        }
     }
-    
-    func toggleBorder(isImageClear: Bool) {
-        borderColor = isImageClear ? .green : .red
-    }
-    
-    func checkImageQuality() {
-        guard let first = firstImage, let second = secondImage else { return }
         
-        let brightnessCheckResult = imageQualityChecker.consistentBrightness(image1: first, image2: second)
-        let isFirstClear = imageQualityChecker.performBlurrinessCheck(for: first)
-        let isSecondClear = imageQualityChecker.performBlurrinessCheck(for: second)
-        let firstWhiteBalance = imageQualityChecker.checkWhiteBalance(for: first)
-        let secondWhiteBalance = imageQualityChecker.checkWhiteBalance(for: second)
+        func toggleBorder(isImageClear: Bool) {
+            borderColor = isImageClear ? .green : .red
+        }
         
-        if brightnessCheckResult.isConsistent && brightnessCheckResult.isExposureGood1 && brightnessCheckResult.isExposureGood2 && isFirstClear && isSecondClear && firstWhiteBalance && secondWhiteBalance{
-            toggleBorder(isImageClear: true)
-        } else {
-            toggleBorder(isImageClear: false)
-            var reasons: [String] = []
-            if !brightnessCheckResult.isConsistent {
-                reasons.append("Brightness is inconsistent between the two images.")
-            }
-            if !brightnessCheckResult.isExposureGood1 {
-                reasons.append("First image has poor exposure")
-            }
-            if !brightnessCheckResult.isExposureGood2 {
-                reasons.append("Second image has poor exposure")
-            }
-            if !isFirstClear {
-                reasons.append("The first image is blurry.")
-            }
-            if !isSecondClear {
-                reasons.append("The second image is blurry.")
-            }
-            if !firstWhiteBalance {
-                reasons.append("First image has poor white balance")
-            }
-            if !secondWhiteBalance {
-                reasons.append("Second image has poor white balance")
-            }
+        func checkImageQuality() {
+            guard let first = firstImage, let second = secondImage else { return }
             
-            feedbackMessage = "Quality check failed: " + reasons.joined(separator: " ")
+            let brightnessCheckResult = imageQualityChecker.consistentBrightness(image1: first, image2: second)
+            let isFirstClear = imageQualityChecker.performBlurrinessCheck(for: first)
+            let isSecondClear = imageQualityChecker.performBlurrinessCheck(for: second)
+            let firstWhiteBalance = imageQualityChecker.checkWhiteBalance(for: first)
+            let secondWhiteBalance = imageQualityChecker.checkWhiteBalance(for: second)
+            
+            if brightnessCheckResult.isConsistent && brightnessCheckResult.isExposureGood1 && brightnessCheckResult.isExposureGood2 && isFirstClear && isSecondClear && firstWhiteBalance && secondWhiteBalance{
+                toggleBorder(isImageClear: true)
+            } else {
+                toggleBorder(isImageClear: false)
+                var reasons: [String] = []
+                if !brightnessCheckResult.isConsistent {
+                    reasons.append("Brightness is inconsistent between the two images.")
+                }
+                if !brightnessCheckResult.isExposureGood1 {
+                    reasons.append("First image has poor exposure")
+                }
+                if !brightnessCheckResult.isExposureGood2 {
+                    reasons.append("Second image has poor exposure")
+                }
+                if !isFirstClear {
+                    reasons.append("The first image is blurry.")
+                }
+                if !isSecondClear {
+                    reasons.append("The second image is blurry.")
+                }
+                if !firstWhiteBalance {
+                    reasons.append("First image has poor white balance")
+                }
+                if !secondWhiteBalance {
+                    reasons.append("Second image has poor white balance")
+                }
+                
+                feedbackMessage = "Quality check failed: " + reasons.joined(separator: " ")
+            }
+        }
+        
+        func createOverlay() {
+            guard let first = firstImage, let second = secondImage else { return }
         }
     }
     
-    func createOverlay() {
-        guard let first = firstImage, let second = secondImage else { return }
+    
+    #Preview {
+        ContentView()
     }
-}
 
-
-#Preview {
-    ContentView()
-}

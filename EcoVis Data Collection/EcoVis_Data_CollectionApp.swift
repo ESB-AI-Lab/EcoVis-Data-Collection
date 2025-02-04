@@ -10,7 +10,7 @@ import ClerkSDK
 
 @main
 struct EcoVis_Data_CollectionApp: App {
-    @ObservedObject private var clerk = Clerk.shared
+    private var clerk = Clerk.shared
     var body: some Scene {
         WindowGroup {
             ZStack {

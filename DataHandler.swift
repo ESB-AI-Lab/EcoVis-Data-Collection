@@ -13,12 +13,12 @@ import UIKit
 class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     private let locationManager = CLLocationManager()
     private let motionManager = CMMotionManager()
-    
+
     @Published var currentLocation: CLLocation?
     @Published var roll: Double = 0
     @Published var pitch: Double = 0
     @Published var yaw: Double = 0
-    
+
     private lazy var dataHandler: DataHandler = {
         return DataHandler.shared
     }()
@@ -27,8 +27,12 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
         super.init()
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
-        locationManager.startUpdatingLocation()
+        // Do not start updating location here, do it in startUpdating() method instead
+    }
 
+    // Start updating location
+    func startUpdating() {
+        locationManager.startUpdatingLocation()
         if motionManager.isDeviceMotionAvailable {
             motionManager.deviceMotionUpdateInterval = 1.0 / 60.0
             motionManager.startDeviceMotionUpdates(to: .main) { (motion, error) in
@@ -59,6 +63,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     }
 }
 
+
 class MotionManager {
     private let motionManager = CMMotionManager()
     
@@ -79,7 +84,7 @@ class MotionManager {
 //To create and manage Core Data Stack and persistent container
 class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "YourDataModelName")
+        let container = NSPersistentContainer(name: "AvacadoVisionData")
         container.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
@@ -104,7 +109,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 class DataHandler {
     static let shared = DataHandler()
     private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
+
+    // Placeholder server URL (update when available)
+    private let serverURL = URL(string: "http://your-server-ip-or-domain.com/upload")!
+
     func saveLocationData(latitude: Double, longitude: Double, roll: Double, pitch: Double, yaw: Double) {
         let newLocationData = NSEntityDescription.insertNewObject(forEntityName: "LocationData", into: context)
         newLocationData.setValue(latitude, forKey: "latitude")
@@ -116,13 +124,52 @@ class DataHandler {
         
         do {
             try context.save()
-            print("Data saved successfully!")
+            print("Data saved locally")
+            
+
+            uploadDataToServer(latitude: latitude, longitude: longitude, roll: roll, pitch: pitch, yaw: yaw)
+            
         } catch {
             print("Failed to save data: \(error)")
         }
     }
-}
 
+    func uploadDataToServer(latitude: Double, longitude: Double, roll: Double, pitch: Double, yaw: Double) {
+        var request = URLRequest(url: serverURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let requestBody: [String: Any] = [
+            "latitude": latitude,
+            "longitude": longitude,
+            "timestamp": ISO8601DateFormatter().string(from: Date()),
+            "roll": roll,
+            "pitch": pitch,
+            "yaw": yaw
+        ]
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
+        } catch {
+            print("Failed to serialize JSON: \(error)")
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error uploading data: \(error.localizedDescription)")
+                return
+            }
+
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                print("Data uploaded successfully")
+            } else {
+                print("Failed to upload data. Response: \(String(describing: response))")
+            }
+        }
+        task.resume()
+    }
+}
     
         
 
