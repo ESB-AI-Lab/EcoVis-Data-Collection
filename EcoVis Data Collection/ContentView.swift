@@ -4,7 +4,6 @@
 //
 //  Created by Kan on 9/25/24.
 //
-//
 
 import SwiftUI
 
@@ -27,49 +26,69 @@ struct ContentView: View {
             VStack(spacing: 20) {
                 // Display the captured images or placeholders
                 HStack {
-                    // First image
-                    if let firstImage = firstImage {
-                        Image(uiImage: firstImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 150)
-                    } else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .frame(width: 100, height: 100)
-                            .foregroundColor(.gray)
+                    VStack {
+                        // First image
+                        if let firstImage = firstImage {
+                            Image(uiImage: firstImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 150)
+                        } else {
+                            Image(systemName: "photo")
+                                .resizable()
+                                .frame(width: 100, height: 100)
+                                .foregroundColor(.gray)
+                        }
                     }
                     
-                    // Second image
-                    if let secondImage = secondImage {
-                        Image(uiImage: secondImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 150)
-                    } else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .frame(width: 100, height: 100)
-                            .foregroundColor(.gray)
+                    VStack {
+                        // Second image
+                        if let secondImage = secondImage {
+                            Image(uiImage: secondImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 150)
+                        } else {
+                            Image(systemName: "photo")
+                                .resizable()
+                                .frame(width: 100, height: 100)
+                                .foregroundColor(.gray)
+                        }
                     }
                 }
 
-                // Button to capture the images
-                Button(isCapturingFirstImage ? "Capture First Image" : "Capture Second Image") {
-                    isShowingCamera = true
+                // Button to capture images (only show if both images are not captured yet)
+                if firstImage == nil || secondImage == nil {
+                    Button(isCapturingFirstImage ? "Capture First Image" : "Capture Second Image") {
+                        showCamera()
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
                 }
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-                .sheet(isPresented: $isShowingCamera) {
-                    CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage)
-                        .onDisappear {
-                            // Move to the next step after capturing the first image
-                            if firstImage != nil && isCapturingFirstImage {
-                                isCapturingFirstImage = false
-                            }
+
+                // Show retake buttons only after both images are taken
+                if firstImage != nil && secondImage != nil {
+                    HStack {
+                        Button("Retake") {
+                            isCapturingFirstImage = true
+                            showCamera()
                         }
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+
+                        Button("Retake") {
+                            isCapturingFirstImage = false
+                            showCamera()
+                        }
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
                 }
 
                 // Check overlap if both images are captured
@@ -92,8 +111,25 @@ struct ContentView: View {
             }
             .padding()
         }
+        .sheet(isPresented: $isShowingCamera) {
+            CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage)
+                .onDisappear {
+                    // Ensure state updates correctly when an image is captured
+                    if firstImage != nil && isCapturingFirstImage {
+                        isCapturingFirstImage = false
+                    }
+                }
+        }
     }
     
+    /// Function to show the camera properly
+    private func showCamera() {
+        isShowingCamera = false  // Reset to ensure the sheet updates
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            isShowingCamera = true  // Reopen camera with a small delay
+        }
+    }
+
     func checkImageOverlap() {
         guard let firstImage = firstImage, let secondImage = secondImage else { return }
 
