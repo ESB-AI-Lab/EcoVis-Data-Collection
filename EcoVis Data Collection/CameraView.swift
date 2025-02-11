@@ -24,6 +24,7 @@ struct CameraView: UIViewControllerRepresentable {
             //Null check and assign image data info
             if let image = info[.originalImage] as? UIImage {
                 parent.image = image
+                parent.onImageCaptured?(image)
             }
             //Close camera
             parent.presentationMode.wrappedValue.dismiss()
@@ -32,6 +33,7 @@ struct CameraView: UIViewControllerRepresentable {
     //Dismissal Control
     @Environment(\.presentationMode) var presentationMode
     @Binding var image: UIImage?
+    var onImageCaptured: ((UIImage) -> Void)?
     
     //Create and return an instance of Coordinator
     func makeCoordinator() -> Coordinator {

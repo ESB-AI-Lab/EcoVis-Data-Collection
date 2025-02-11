@@ -9,6 +9,7 @@ import CoreLocation
 import CoreMotion
 import CoreData
 import UIKit
+import Foundation
 
 class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     private let locationManager = CLLocationManager()
@@ -30,7 +31,6 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
         // Do not start updating location here, do it in startUpdating() method instead
     }
 
-    // Start updating location
     func startUpdating() {
         locationManager.startUpdatingLocation()
         if motionManager.isDeviceMotionAvailable {
@@ -49,17 +49,21 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
         if let location = locations.last {
             currentLocation = location
             print("Latitude: \(location.coordinate.latitude), Longitude: \(location.coordinate.longitude)")
-
-            dataHandler.saveLocationData(latitude: location.coordinate.latitude,
-                                          longitude: location.coordinate.longitude,
-                                          roll: roll,
-                                          pitch: pitch,
-                                          yaw: yaw)
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location update failed: \(error)")
+    }
+    
+    func saveImageWithMetadata(image: UIImage, location: CLLocationCoordinate2D) {
+        dataHandler.saveImageAndMetadata(
+            image: image,
+            location: location,
+            roll: roll,
+            pitch: pitch,
+            yaw: yaw
+        )
     }
 }
 
@@ -105,69 +109,114 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 }
+
 //Singleton to simplify data handling with a streamlined API
 class DataHandler {
     static let shared = DataHandler()
-    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-
-    // Placeholder server URL (update when available)
-    private let serverURL = URL(string: "http://your-server-ip-or-domain.com/upload")!
-
-    func saveLocationData(latitude: Double, longitude: Double, roll: Double, pitch: Double, yaw: Double) {
-        let newLocationData = NSEntityDescription.insertNewObject(forEntityName: "LocationData", into: context)
-        newLocationData.setValue(latitude, forKey: "latitude")
-        newLocationData.setValue(longitude, forKey: "longitude")
-        newLocationData.setValue(Date(), forKey: "timestamp")
-        newLocationData.setValue(roll, forKey: "roll")
-        newLocationData.setValue(pitch, forKey: "pitch")
-        newLocationData.setValue(yaw, forKey: "yaw")
+    private let fileManager = FileManager.default
+    private let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    
+    private var imageMetadataList: [ImageData] = []
+    
+    private init() {
+        loadExistingMetadata()
+    }
+    
+    struct ImageData: Codable {
+        let imageFilename: String
+        let latitude: Double
+        let longitude: Double
+        let roll: Double
+        let pitch: Double
+        let yaw: Double
+    }
+    
+    private func loadExistingMetadata() {
+        let jsonFilePath = documentsURL.appendingPathComponent("metadata.json")
         
-        do {
-            try context.save()
-            print("Data saved locally")
-            
-
-            uploadDataToServer(latitude: latitude, longitude: longitude, roll: roll, pitch: pitch, yaw: yaw)
-            
-        } catch {
-            print("Failed to save data: \(error)")
+        if fileManager.fileExists(atPath: jsonFilePath.path) {
+            do {
+                let jsonData = try Data(contentsOf: jsonFilePath)
+                imageMetadataList = try JSONDecoder().decode([ImageData].self, from: jsonData)
+            } catch {
+                print("Error loading existing JSON: \(error)")
+            }
         }
     }
+    
+    func saveImageAndMetadata(image: UIImage, location: CLLocationCoordinate2D, roll: Double, pitch: Double, yaw: Double) {
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let imageFilename = "image_\(timestamp).jpg"
+        let imagePath = documentsURL.appendingPathComponent(imageFilename)
+     
+        if let jpegData = image.jpegData(compressionQuality: 0.8) {
+            do {
+                try jpegData.write(to: imagePath)
+                print("Image saved: \(imagePath)")
+            } catch {
+                print("Error saving image: \(error)")
+                return
+            }
+        }
 
-    func uploadDataToServer(latitude: Double, longitude: Double, roll: Double, pitch: Double, yaw: Double) {
-        var request = URLRequest(url: serverURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let newImageData = ImageData(
+            imageFilename: imageFilename,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            roll: roll,
+            pitch: pitch,
+            yaw: yaw
+        )
+        
+        imageMetadataList.append(newImageData)
 
-        let requestBody: [String: Any] = [
-            "latitude": latitude,
-            "longitude": longitude,
-            "timestamp": ISO8601DateFormatter().string(from: Date()),
-            "roll": roll,
-            "pitch": pitch,
-            "yaw": yaw
-        ]
-
+        saveMetadataToJSON()
+    }
+    
+    private func saveMetadataToJSON() {
+        let jsonFilePath = documentsURL.appendingPathComponent("metadata.json")
+        
         do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
+            let updatedJsonData = try JSONEncoder().encode(imageMetadataList)
+            try updatedJsonData.write(to: jsonFilePath)
+            print("Metadata saved: \(jsonFilePath)")
         } catch {
-            print("Failed to serialize JSON: \(error)")
+            print("Error writing JSON: \(error)")
+        }
+    }
+    
+    
+    func getMetadataList() -> [ImageData] {
+        return imageMetadataList
+    }
+    
+    func uploadDataToServer(serverURL: URL) {
+        var uploadData: [String: Any] = [:]
+        uploadData["metadata"] = imageMetadataList
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: uploadData, options: []) else {
+            print("Error serializing metadata to JSON.")
             return
         }
 
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        var request = URLRequest(url: serverURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+        
+        let session = URLSession.shared
+        session.dataTask(with: request) { (data, response, error) in
             if let error = error {
                 print("Error uploading data: \(error.localizedDescription)")
                 return
             }
 
             if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                print("Data uploaded successfully")
+                print("Data uploaded successfully!")
             } else {
-                print("Failed to upload data. Response: \(String(describing: response))")
+                print("Failed to upload data: \(String(describing: response))")
             }
-        }
-        task.resume()
+        }.resume()
     }
 }
     

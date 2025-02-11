@@ -63,7 +63,16 @@ struct ContentView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .sheet(isPresented: $isShowingCamera) {
-                            CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage) // This shows the camera
+                            CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage, onImageCaptured: { capturedImage in
+                                if let currentLocation = locationManager.currentLocation {
+                                    locationManager.saveImageWithMetadata(
+                                        image: capturedImage,
+                                        location: currentLocation.coordinate
+                                    )
+                                } else {
+                                    print("Location not available, cannot save metadata")
+                                }
+                            })
                         }
                         
                         if firstImage != nil && secondImage != nil {
