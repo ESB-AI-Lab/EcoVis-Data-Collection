@@ -14,24 +14,42 @@ struct ContentView: View {
     @State private var isCapturingFirstImage = true
     @State private var feedbackMessage = ""
     @State private var borderColor: Color = .clear
+    
+    // State variables for region selection on the first image.
+    // selectedRegion will be in the image’s pixel space after conversion.
+    @State private var selectedRegion: CGRect? = nil
+    @State private var regionSelectionCompleted: Bool = false
+    @State private var regionEditing: Bool = true
 
     let imageOverlapChecker = ImageOverlapChecker()
 
     var body: some View {
         ZStack {
-            // Apply the border as a background.
+            // Background border for visual feedback (green/red) after checking overlap
             Rectangle()
                 .stroke(borderColor, lineWidth: 20)
             
             VStack(spacing: 20) {
-                // Display the captured images or placeholders.
+                // Two images side-by-side
                 HStack {
+                    // First image with an overlay for drawing a rectangle
                     VStack {
                         if let firstImage = firstImage {
-                            Image(uiImage: firstImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 150)
+                            ZStack {
+                                Image(uiImage: firstImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 150)
+                                    .overlay(
+                                        // RegionSelectorView draws a rectangle and converts coords
+                                        RegionSelectorView(
+                                            image: firstImage,
+                                            selectedRect: $selectedRegion,
+                                            isCompleted: $regionSelectionCompleted,
+                                            isEditable: regionEditing
+                                        )
+                                    )
+                            }
                         } else {
                             Image(systemName: "photo")
                                 .resizable()
@@ -40,6 +58,7 @@ struct ContentView: View {
                         }
                     }
                     
+                    // Second image
                     VStack {
                         if let secondImage = secondImage {
                             Image(uiImage: secondImage)
@@ -54,8 +73,21 @@ struct ContentView: View {
                         }
                     }
                 }
-
-                // Button to capture images.
+                
+                // "Redraw Region" button appears only after region is drawn
+                if firstImage != nil, regionSelectionCompleted {
+                    Button("Redraw Region") {
+                        regionEditing = true
+                        regionSelectionCompleted = false
+                        selectedRegion = nil
+                    }
+                    .padding()
+                    .background(Color.purple)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                
+                // If we haven't captured both images yet, show "Capture" button
                 if firstImage == nil || secondImage == nil {
                     Button(isCapturingFirstImage ? "Capture First Image" : "Capture Second Image") {
                         showCamera()
@@ -65,12 +97,16 @@ struct ContentView: View {
                     .foregroundColor(.white)
                     .cornerRadius(10)
                 }
-
-                // Retake buttons (displayed only after both images are taken).
+                
+                // If both images exist, show Retake buttons
                 if firstImage != nil && secondImage != nil {
                     HStack {
                         Button("Retake First") {
                             isCapturingFirstImage = true
+                            // Reset region
+                            regionSelectionCompleted = false
+                            selectedRegion = nil
+                            regionEditing = true
                             showCamera()
                         }
                         .padding()
@@ -88,19 +124,23 @@ struct ContentView: View {
                         .cornerRadius(10)
                     }
                 }
-
-                // Check object overlap if both images are captured.
-                if firstImage != nil && secondImage != nil {
+                
+                // "Check Overlap" available if both images exist and region is drawn
+                if firstImage != nil,
+                   secondImage != nil,
+                   regionSelectionCompleted,
+                   selectedRegion != nil
+                {
                     Button("Check Overlap") {
-                        checkObjectOverlap()
+                        checkRegionOverlap()
                     }
                     .padding()
                     .background(Color.green)
                     .foregroundColor(.white)
                     .cornerRadius(10)
                 }
-
-                // Show feedback message.
+                
+                // Feedback message (green or red)
                 if !feedbackMessage.isEmpty {
                     Text(feedbackMessage)
                         .foregroundColor(borderColor == .green ? .green : .red)
@@ -109,10 +149,17 @@ struct ContentView: View {
             }
             .padding()
         }
+        // Present camera
         .sheet(isPresented: $isShowingCamera) {
             CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage)
                 .onDisappear {
-                    // Update state: if first image was just captured, switch to capturing second.
+                    // After capturing first image, reset region selection
+                    if isCapturingFirstImage, firstImage != nil {
+                        regionSelectionCompleted = false
+                        selectedRegion = nil
+                        regionEditing = true
+                    }
+                    // Once first image is captured, switch to second
                     if firstImage != nil && isCapturingFirstImage {
                         isCapturingFirstImage = false
                     }
@@ -127,28 +174,23 @@ struct ContentView: View {
         }
     }
     
-    func checkObjectOverlap() {
-        guard let firstImage = firstImage, let secondImage = secondImage else { return }
+    /// Compares the user-drawn region between both images
+    func checkRegionOverlap() {
+        guard let firstImage = firstImage,
+              let secondImage = secondImage,
+              let region = selectedRegion else {
+            return
+        }
         
-        imageOverlapChecker.checkObjectOverlap(image1: firstImage, image2: secondImage) { overlapDetected in
-            DispatchQueue.main.async {
-                if overlapDetected {
-                    feedbackMessage = "The selected object overlaps!"
-                    borderColor = .green
-                } else {
-                    feedbackMessage = "No overlap detected for the selected object."
-                    borderColor = .red
-                }
-            }
+        let overlapDetected = imageOverlapChecker.checkRegionOverlap(image1: firstImage,
+                                                                     image2: secondImage,
+                                                                     region: region)
+        if overlapDetected {
+            feedbackMessage = "The selected region overlaps!"
+            borderColor = .green
+        } else {
+            feedbackMessage = "No sufficient overlap in the selected region."
+            borderColor = .red
         }
     }
 }
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
-
-
-

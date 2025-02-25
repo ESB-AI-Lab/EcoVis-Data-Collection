@@ -18,6 +18,7 @@
 		3E3948F62CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */; };
 		565F31822D2026C100EE1718 /* ImageOverlapChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565F317C2D20221100EE1718 /* ImageOverlapChecker.swift */; };
 		565F31832D2026C100EE1718 /* ImageOverlapTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565F317E2D20237200EE1718 /* ImageOverlapTest.swift */; };
+		5F99B6F82D6E506D0002B1DB /* RegionSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F99B6F72D6E506A0002B1DB /* RegionSelectorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoVis_Data_CollectionUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		565F317C2D20221100EE1718 /* ImageOverlapChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlapChecker.swift; sourceTree = "<group>"; };
 		565F317E2D20237200EE1718 /* ImageOverlapTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlapTest.swift; sourceTree = "<group>"; };
+		5F99B6F72D6E506A0002B1DB /* RegionSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionSelectorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +110,7 @@
 				3E2A51122CD8A43900AD3CAF /* EcoVis-Data-Collection-Info.plist */,
 				3E3948D82CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift */,
 				3E3948DA2CA5149F0068F225 /* ContentView.swift */,
+				5F99B6F72D6E506A0002B1DB /* RegionSelectorView.swift */,
 				3E2E51AB2CC2265600932E7B /* CameraView.swift */,
 				3E2A51132CD8A9F000AD3CAF /* ImageQualityChecker.swift */,
 				3E3948DC2CA514A00068F225 /* Assets.xcassets */,
@@ -272,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3E2E51AC2CC2265600932E7B /* CameraView.swift in Sources */,
+				5F99B6F82D6E506D0002B1DB /* RegionSelectorView.swift in Sources */,
 				3E2A51142CD8AA0200AD3CAF /* ImageQualityChecker.swift in Sources */,
 				3E3948DB2CA5149F0068F225 /* ContentView.swift in Sources */,
 				3E3948D92CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift in Sources */,
