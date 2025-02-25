@@ -19,15 +19,14 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            // Apply the border as a background
+            // Apply the border as a background.
             Rectangle()
-                .stroke(borderColor, lineWidth: 20) // Draw the border
+                .stroke(borderColor, lineWidth: 20)
             
             VStack(spacing: 20) {
-                // Display the captured images or placeholders
+                // Display the captured images or placeholders.
                 HStack {
                     VStack {
-                        // First image
                         if let firstImage = firstImage {
                             Image(uiImage: firstImage)
                                 .resizable()
@@ -42,7 +41,6 @@ struct ContentView: View {
                     }
                     
                     VStack {
-                        // Second image
                         if let secondImage = secondImage {
                             Image(uiImage: secondImage)
                                 .resizable()
@@ -57,7 +55,7 @@ struct ContentView: View {
                     }
                 }
 
-                // Button to capture images (only show if both images are not captured yet)
+                // Button to capture images.
                 if firstImage == nil || secondImage == nil {
                     Button(isCapturingFirstImage ? "Capture First Image" : "Capture Second Image") {
                         showCamera()
@@ -68,10 +66,10 @@ struct ContentView: View {
                     .cornerRadius(10)
                 }
 
-                // Show retake buttons only after both images are taken
+                // Retake buttons (displayed only after both images are taken).
                 if firstImage != nil && secondImage != nil {
                     HStack {
-                        Button("Retake") {
+                        Button("Retake First") {
                             isCapturingFirstImage = true
                             showCamera()
                         }
@@ -80,7 +78,7 @@ struct ContentView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
 
-                        Button("Retake") {
+                        Button("Retake Second") {
                             isCapturingFirstImage = false
                             showCamera()
                         }
@@ -91,10 +89,10 @@ struct ContentView: View {
                     }
                 }
 
-                // Check overlap if both images are captured
+                // Check object overlap if both images are captured.
                 if firstImage != nil && secondImage != nil {
                     Button("Check Overlap") {
-                        checkImageOverlap()
+                        checkObjectOverlap()
                     }
                     .padding()
                     .background(Color.green)
@@ -102,7 +100,7 @@ struct ContentView: View {
                     .cornerRadius(10)
                 }
 
-                // Show feedback message
+                // Show feedback message.
                 if !feedbackMessage.isEmpty {
                     Text(feedbackMessage)
                         .foregroundColor(borderColor == .green ? .green : .red)
@@ -114,7 +112,7 @@ struct ContentView: View {
         .sheet(isPresented: $isShowingCamera) {
             CameraView(image: isCapturingFirstImage ? $firstImage : $secondImage)
                 .onDisappear {
-                    // Ensure state updates correctly when an image is captured
+                    // Update state: if first image was just captured, switch to capturing second.
                     if firstImage != nil && isCapturingFirstImage {
                         isCapturingFirstImage = false
                     }
@@ -122,24 +120,35 @@ struct ContentView: View {
         }
     }
     
-    /// Function to show the camera properly
     private func showCamera() {
-        isShowingCamera = false  // Reset to ensure the sheet updates
+        isShowingCamera = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            isShowingCamera = true  // Reopen camera with a small delay
+            isShowingCamera = true
         }
     }
-
-    func checkImageOverlap() {
+    
+    func checkObjectOverlap() {
         guard let firstImage = firstImage, let secondImage = secondImage else { return }
-
-        let overlapDetected = imageOverlapChecker.checkImageOverlap(firstImage, secondImage)
-        if overlapDetected {
-            feedbackMessage = "The images overlap!"
-            borderColor = .green
-        } else {
-            feedbackMessage = "No overlap detected."
-            borderColor = .red
+        
+        imageOverlapChecker.checkObjectOverlap(image1: firstImage, image2: secondImage) { overlapDetected in
+            DispatchQueue.main.async {
+                if overlapDetected {
+                    feedbackMessage = "The selected object overlaps!"
+                    borderColor = .green
+                } else {
+                    feedbackMessage = "No overlap detected for the selected object."
+                    borderColor = .red
+                }
+            }
         }
     }
 }
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
+
+
+
