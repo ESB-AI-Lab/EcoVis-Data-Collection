@@ -9,9 +9,21 @@ import SwiftUI
 
 @main
 struct EcoVis_Data_CollectionApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
+    enum Mode { case object, row }
+        @State private var selectedMode: Mode? = nil
+
+        var body: some Scene {
+            WindowGroup {
+                if let mode = selectedMode {
+                    switch mode {
+                    case .object:
+                        ContentView()
+                    case .row:
+                        RowModeView()
+                    }
+                } else {
+                    ModeSelectionView(selectedMode: $selectedMode)
+                }
+            }
         }
     }
-}
