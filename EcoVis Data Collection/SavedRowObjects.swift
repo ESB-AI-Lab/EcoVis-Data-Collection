@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// Displays saved images grouped by "Row R Object O"
 struct SavedRowObjectsView: View {
     let savedData: [String: [UIImage]]
     let onReset: () -> Void

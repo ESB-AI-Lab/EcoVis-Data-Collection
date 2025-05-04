@@ -23,6 +23,7 @@
 		5F9AC0D52DC2195300108956 /* RowModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9AC0D42DC2195100108956 /* RowModeView.swift */; };
 		5F9AC0D72DC2196600108956 /* SavedRowObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9AC0D62DC2195E00108956 /* SavedRowObjects.swift */; };
 		5FA324DF2D801B9800159700 /* SavedImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA324DE2D801B9400159700 /* SavedImagesView.swift */; };
+		5FF242022DC767ED00835713 /* RegionEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF242012DC767EA00835713 /* RegionEditView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		5F9AC0D42DC2195100108956 /* RowModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowModeView.swift; sourceTree = "<group>"; };
 		5F9AC0D62DC2195E00108956 /* SavedRowObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRowObjects.swift; sourceTree = "<group>"; };
 		5FA324DE2D801B9400159700 /* SavedImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedImagesView.swift; sourceTree = "<group>"; };
+		5FF242012DC767EA00835713 /* RegionEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionEditView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +115,7 @@
 		3E3948D72CA5149F0068F225 /* EcoVis Data Collection */ = {
 			isa = PBXGroup;
 			children = (
+				5FF242012DC767EA00835713 /* RegionEditView.swift */,
 				5F9AC0D62DC2195E00108956 /* SavedRowObjects.swift */,
 				5F9AC0D42DC2195100108956 /* RowModeView.swift */,
 				5F9AC0D22DC20DE500108956 /* ModeSelectionView.swift */,
@@ -290,6 +293,7 @@
 				5F9AC0D32DC20DE800108956 /* ModeSelectionView.swift in Sources */,
 				3E2E51AC2CC2265600932E7B /* CameraView.swift in Sources */,
 				5F99B6F82D6E506D0002B1DB /* RegionSelectorView.swift in Sources */,
+				5FF242022DC767ED00835713 /* RegionEditView.swift in Sources */,
 				3E2A51142CD8AA0200AD3CAF /* ImageQualityChecker.swift in Sources */,
 				3E3948DB2CA5149F0068F225 /* ContentView.swift in Sources */,
 				5FA324DF2D801B9800159700 /* SavedImagesView.swift in Sources */,

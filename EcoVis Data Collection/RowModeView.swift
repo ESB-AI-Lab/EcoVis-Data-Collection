@@ -7,7 +7,6 @@
 import SwiftUI
 
 struct RowModeView: View {
-    // MARK: State
     @State private var rowStarted = false
     @State private var currentRow = 1
     @State private var frontCount = 0
@@ -19,10 +18,10 @@ struct RowModeView: View {
 
     @State private var selectedRegion: CGRect? = nil
     @State private var regionSelectionCompleted = false
-    @State private var regionEditing = true
 
     @State private var isShowingCamera = false
     @State private var isCapturingReference = true
+    @State private var showRegionEditor = false
 
     @State private var feedbackMessage = ""
     @State private var borderColor: Color = .clear
@@ -30,7 +29,6 @@ struct RowModeView: View {
     @State private var errorMessage = ""
 
     @State private var savedData: [String: [UIImage]] = [:]
-
     @State private var showSaved = false
 
     let checker = ImageOverlapChecker()
@@ -42,25 +40,53 @@ struct RowModeView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(spacing: 16) {
-                Text("Take a reference image from the left/right side of each object, and take photos rotating 180° toward the opposite side of the reference. Then, continue for the reverse side of each object in the same row, and repeat for each new row while pathing in a zig zag pattern.")
+                Text("Take a reference image from the left/right side of each object, and take photos rotating 180° toward the opposite side of the reference. Then, continue for the reverse side of each object in the same row, and repeat for each new row while pathing in a zig zag pattern. Keep object centered within the region you selected in the reference image in each proceeding image to ensure best overlap detection results.")
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.blue)
                     .padding()
 
                 if !rowStarted {
-                    Button("New Row") {
-                        startNewRow()
-                    }
-                    .rowButtonStyle(color: .blue)
+                    Button("New Row") { startNewRow() }
+                        .rowButtonStyle(color: .blue)
 
                 } else {
                     Text("Row \(currentRow) — \(backside ? "Backside" : "Frontside") Object \(currentObject)")
                         .font(.headline)
 
                     HStack {
-                        previewColumn(title: "Reference", image: referenceImage)
-                            .overlay(regionOverlay)
+                        // —— Reference preview with scaled overlay ——
+                        VStack {
+                            Text("Reference")
+                            ZStack {
+                                if let img = referenceImage {
+                                    Image(uiImage: img)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 120)
+                                        .overlay(
+                                            RegionSelectorView(
+                                                image: img,
+                                                selectedRect: $selectedRegion,
+                                                isCompleted: $regionSelectionCompleted,
+                                                isEditable: false
+                                            )
+                                        )
+                                        .onTapGesture { showRegionEditor = true }
+                                } else {
+                                    Rectangle()
+                                        .stroke(Color.gray)
+                                        .overlay(
+                                            Text("None")
+                                                .foregroundColor(.gray)
+                                        )
+                                        .frame(height: 120)
+                                }
+                            }
+                            .frame(height: 120)
+                        }
+
+                        // —— Next preview —— unchanged except placeholder color
                         previewColumn(title: "Next", image: nextImage)
                     }
 
@@ -101,6 +127,11 @@ struct RowModeView: View {
                         showSaved = true
                     }
                     .rowButtonStyle(color: .pink)
+
+                    Text("Tap the reference image to edit the region")
+                        .foregroundColor(.blue)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 8)
                 }
 
                 if !feedbackMessage.isEmpty {
@@ -111,24 +142,44 @@ struct RowModeView: View {
             .padding()
         }
         .navigationTitle("Row Mode")
+
+        // full‑screen region editor
+        .fullScreenCover(isPresented: $showRegionEditor) {
+            if let img = referenceImage {
+                RegionEditView(
+                    image: img,
+                    selectedRect: $selectedRegion,
+                    isCompleted: $regionSelectionCompleted
+                )
+            }
+        }
+
+        // camera sheet
         .sheet(isPresented: $isShowingCamera) {
             CameraView(image: isCapturingReference ? $referenceImage : $nextImage)
                 .onDisappear {
                     if isCapturingReference { handleReferenceCaptured() }
-                    else { handleNextCaptured() }
+                    else                   { handleNextCaptured() }
                 }
         }
-        .alert(isPresented: $showErrorAlert) {
-            Alert(title: Text("Error"),
-                  message: Text(errorMessage),
-                  dismissButton: .default(Text("OK")))
-        }
+
+        // saved‑images sheet
         .sheet(isPresented: $showSaved) {
-            SavedRowObjectsView(savedData: savedData,
-                                onReset: globalReset)
+            SavedRowObjectsView(
+                savedData: savedData,
+                onReset: globalReset
+            )
         }
     }
 
+    // MARK: - Helpers
+
+    private func showCamera() {
+        isShowingCamera = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            isShowingCamera = true
+        }
+    }
 
     private func previewColumn(title: String, image: UIImage?) -> some View {
         VStack {
@@ -141,36 +192,20 @@ struct RowModeView: View {
                 } else {
                     Rectangle()
                         .stroke(Color.gray)
-                        .overlay(Text("None"))
+                        .overlay(
+                            Text("None")
+                                .foregroundColor(.gray)
+                        )
                 }
             }
             .frame(height: 120)
         }
     }
 
-    private var regionOverlay: some View {
-        RegionSelectorView(
-            image: referenceImage ?? UIImage(),
-            selectedRect: $selectedRegion,
-            isCompleted: $regionSelectionCompleted,
-            isEditable: regionEditing
-        )
-    }
-
-
-    private func showCamera() {
-        isShowingCamera = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            isShowingCamera = true
-        }
-    }
-
-
     private func startNewRow() {
         if backside,
            referenceImage != nil,
-           nextImage != nil
-        {
+           nextImage != nil {
             saveCurrentBackside()
         }
         rowStarted = true
@@ -181,7 +216,6 @@ struct RowModeView: View {
         nextImage = nil
         selectedRegion = nil
         regionSelectionCompleted = false
-        regionEditing = true
         borderColor = .clear
         feedbackMessage = "Row \(currentRow) started.\nDraw region & capture images."
     }
@@ -197,25 +231,19 @@ struct RowModeView: View {
            let region = selectedRegion,
            regionSelectionCompleted
         {
-            let ok = checker.checkRegionOverlap(
-                image1: ref,
-                image2: nxt,
-                region: region
-            )
+            let ok = checker.checkRegionOverlap(image1: ref, image2: nxt, region: region)
             feedbackMessage = ok ? "Overlap Detected" : "No overlap"
             borderColor = ok ? .green : .red
         }
     }
 
     private func newObjectPressed() {
-        guard let ref = referenceImage,
-              let nxt = nextImage else {
+        guard let ref = referenceImage, let nxt = nextImage else {
             errorMessage = "Capture both images before Next Object."
             showErrorAlert = true
             return
         }
         let key = "Row \(currentRow) Object \(currentObject)"
-
         if !backside {
             savedData[key] = [ref, nxt]
             frontCount += 1
@@ -227,24 +255,19 @@ struct RowModeView: View {
             } else {
                 savedData[key] = [ref, nxt]
             }
-            if currentObject > 1 {
-                currentObject -= 1
-            }
+            if currentObject > 1 { currentObject -= 1 }
         }
-
         feedbackMessage = "\(key) saved."
         referenceImage = nil
         nextImage = nil
         selectedRegion = nil
         regionSelectionCompleted = false
-        regionEditing = true
     }
 
     private func reverseSidePressed() {
         if !backside,
            referenceImage != nil,
-           nextImage != nil
-        {
+           nextImage != nil {
             let key = "Row \(currentRow) Object \(currentObject)"
             savedData[key] = [referenceImage!, nextImage!]
             frontCount += 1
@@ -260,15 +283,13 @@ struct RowModeView: View {
         nextImage = nil
         selectedRegion = nil
         regionSelectionCompleted = false
-        regionEditing = true
         feedbackMessage = "Backside start at object \(currentObject)."
     }
 
     private func newRowPressed() {
         if backside,
            referenceImage != nil,
-           nextImage != nil
-        {
+           nextImage != nil {
             saveCurrentBackside()
         }
         currentRow += 1
@@ -297,7 +318,6 @@ struct RowModeView: View {
         nextImage = nil
         selectedRegion = nil
         regionSelectionCompleted = false
-        regionEditing = true
         feedbackMessage = ""
         borderColor = .clear
         savedData.removeAll()

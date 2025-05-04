@@ -7,30 +7,26 @@
 import SwiftUI
 
 struct ContentView: View {
-    // Left & right images currently displayed in the UI:
-    @State private var leftImage: UIImage? = nil   // The reference image
-    @State private var rightImage: UIImage? = nil  // The next image
+    // MARK: State
+    @State private var leftImage: UIImage? = nil    // Reference image
+    @State private var rightImage: UIImage? = nil   // Next image
 
-    // Arrays storing all captured images:
     @State private var savedLeftImages: [UIImage] = []
     @State private var savedRightImages: [UIImage] = []
 
-    // For camera & region selection
     @State private var isShowingCamera = false
     @State private var isCapturingLeft = true
+
+    @State private var selectedRegion: CGRect? = nil
+    @State private var regionSelectionCompleted = false
+
+    @State private var showRegionEditor = false
     @State private var feedbackMessage = ""
     @State private var borderColor: Color = .clear
 
-    // Rectangle selection (in image pixel coords) for the reference (left) image
-    @State private var selectedRegion: CGRect? = nil
-    @State private var regionSelectionCompleted: Bool = false
-    @State private var regionEditing: Bool = true
-
-    // Overlap checker
-    let imageOverlapChecker = ImageOverlapChecker()
-
-    // Shows a list of all saved images after "Upload"
     @State private var showSavedImages = false
+
+    let imageOverlapChecker = ImageOverlapChecker()
 
     var body: some View {
         ZStack {
@@ -39,53 +35,42 @@ struct ContentView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(spacing: 20) {
+                // Instruction
                 Text("Retake reference image each time you have rotated 90° around the object")
                     .foregroundColor(.blue)
                     .multilineTextAlignment(.center)
                     .padding()
 
-                HStack {
-                    // Reference
+                // Previews
+                HStack(spacing: 16) {
+                    // —— Reference Preview ——
                     VStack {
+                        Text("Reference")
+                            .font(.subheadline)
                         ZStack {
-                            if let leftImage = leftImage {
-                                Image(uiImage: leftImage)
+                            if let img = leftImage {
+                                Image(uiImage: img)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 150)
-                                    .overlay(
-                                        RegionSelectorView(
-                                            image: leftImage,
-                                            selectedRect: $selectedRegion,
-                                            isCompleted: $regionSelectionCompleted,
-                                            isEditable: regionEditing
-                                        )
-                                    )
                             } else {
-                                Image(systemName: "photo")
-                                    .resizable()
-                                    .frame(width: 100, height: 100)
-                                    .foregroundColor(.gray)
+                                Rectangle()
+                                    .stroke(Color.gray)
+                                    .overlay(Text("None").foregroundColor(.gray))
                             }
                         }
+                        .frame(height: 150)
+                        .overlay(regionOverlay)       // draw the red box here
+                    }
+                    .onTapGesture {
+                        guard leftImage != nil else { return }
+                        showRegionEditor = true
                     }
 
-                    // Next
-                    VStack {
-                        if let rightImage = rightImage {
-                            Image(uiImage: rightImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 150)
-                        } else {
-                            Image(systemName: "photo")
-                                .resizable()
-                                .frame(width: 100, height: 100)
-                                .foregroundColor(.gray)
-                        }
-                    }
+                    // —— Next Preview ——
+                    previewColumn(title: "Next", image: rightImage)
                 }
 
+                // Capture buttons
                 Button("Capture Reference Image") {
                     isCapturingLeft = true
                     showCamera()
@@ -104,6 +89,7 @@ struct ContentView: View {
                 .foregroundColor(.white)
                 .cornerRadius(10)
 
+                // Check Overlap
                 if leftImage != nil,
                    rightImage != nil,
                    regionSelectionCompleted,
@@ -118,6 +104,7 @@ struct ContentView: View {
                     .cornerRadius(10)
                 }
 
+                // Upload
                 Button("Upload") {
                     showSavedImages = true
                 }
@@ -126,6 +113,7 @@ struct ContentView: View {
                 .foregroundColor(.white)
                 .cornerRadius(10)
 
+                // Feedback
                 if !feedbackMessage.isEmpty {
                     Text(feedbackMessage)
                         .foregroundColor(borderColor == .green ? .green : .red)
@@ -135,6 +123,28 @@ struct ContentView: View {
             .padding()
         }
         .navigationTitle("Object Mode")
+
+        // Full-screen region editor
+        .fullScreenCover(isPresented: $showRegionEditor) {
+            if let img = leftImage {
+                RegionEditView(
+                    image: img,
+                    selectedRect: $selectedRegion,
+                    isCompleted: $regionSelectionCompleted
+                )
+            }
+        }
+
+        // Camera sheet
+        .sheet(isPresented: $isShowingCamera) {
+            CameraView(image: isCapturingLeft ? $leftImage : $rightImage)
+                .onDisappear {
+                    if isCapturingLeft { handleNewLeftImage() }
+                    else             { handleNewRightImage() }
+                }
+        }
+
+        // Saved‑images sheet
         .sheet(isPresented: $showSavedImages) {
             SavedImagesView(
                 leftImages: savedLeftImages,
@@ -142,15 +152,27 @@ struct ContentView: View {
                 onReset: resetAll
             )
         }
-        .sheet(isPresented: $isShowingCamera) {
-            CameraView(image: isCapturingLeft ? $leftImage : $rightImage)
-                .onDisappear {
-                    if isCapturingLeft {
-                        handleNewLeftImage()
-                    } else {
-                        handleNewRightImage()
-                    }
+    }
+
+    // MARK: – Helpers
+
+    /// The generic “Next” preview column
+    private func previewColumn(title: String, image: UIImage?) -> some View {
+        VStack {
+            Text(title)
+                .font(.subheadline)
+            ZStack {
+                if let ui = image {
+                    Image(uiImage: ui)
+                        .resizable()
+                        .scaledToFit()
+                } else {
+                    Rectangle()
+                        .stroke(Color.gray)
+                        .overlay(Text("None").foregroundColor(.gray))
                 }
+            }
+            .frame(height: 150)
         }
     }
 
@@ -166,7 +188,6 @@ struct ContentView: View {
         savedLeftImages.append(img)
         regionSelectionCompleted = false
         selectedRegion = nil
-        regionEditing = true
         feedbackMessage = "Captured a new REFERENCE image. Draw a region & capture next images!"
         borderColor = .clear
     }
@@ -216,8 +237,18 @@ struct ContentView: View {
         savedRightImages.removeAll()
         selectedRegion = nil
         regionSelectionCompleted = false
-        regionEditing = true
         feedbackMessage = ""
         borderColor = .clear
     }
+
+    /// Draws the saved region over the small preview
+    private var regionOverlay: some View {
+        RegionSelectorView(
+            image: leftImage ?? UIImage(),
+            selectedRect: $selectedRegion,
+            isCompleted: $regionSelectionCompleted,
+            isEditable: false
+        )
+    }
 }
+
