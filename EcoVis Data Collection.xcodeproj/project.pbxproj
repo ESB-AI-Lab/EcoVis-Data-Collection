@@ -17,6 +17,14 @@
 		3E3948EA2CA514A00068F225 /* EcoVis_Data_CollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948E92CA514A00068F225 /* EcoVis_Data_CollectionTests.swift */; };
 		3E3948F42CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948F32CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift */; };
 		3E3948F62CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */; };
+		5FC148512DCB2A3600B3C1E5 /* ImageOverlapChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC148502DCB2A3000B3C1E5 /* ImageOverlapChecker.swift */; };
+		5FC148532DCB2A4F00B3C1E5 /* ImageOverlapTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC148522DCB2A4900B3C1E5 /* ImageOverlapTest.swift */; };
+		5FC148552DCB2A6100B3C1E5 /* ModeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC148542DCB2A5E00B3C1E5 /* ModeSelectionView.swift */; };
+		5FC148572DCB2A7000B3C1E5 /* RegionEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC148562DCB2A6D00B3C1E5 /* RegionEditView.swift */; };
+		5FC148592DCB2A9D00B3C1E5 /* RegionSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC148582DCB2A9900B3C1E5 /* RegionSelectorView.swift */; };
+		5FC1485B2DCB2AB300B3C1E5 /* RowModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC1485A2DCB2AAD00B3C1E5 /* RowModeView.swift */; };
+		5FC1485D2DCB2ACB00B3C1E5 /* SavedImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC1485C2DCB2AC800B3C1E5 /* SavedImagesView.swift */; };
+		5FC1485F2DCB2AE000B3C1E5 /* SavedRowObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC1485E2DCB2AD800B3C1E5 /* SavedRowObjects.swift */; };
 		5FE27CAD2D16CBA900FAC8A5 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE27CAC2D16CBA500FAC8A5 /* SignUpView.swift */; };
 		5FE27CAF2D16CBBD00FAC8A5 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE27CAE2D16CBBB00FAC8A5 /* SignInView.swift */; };
 		5FE27CB12D16CBCE00FAC8A5 /* SignUpOrSignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE27CB02D16CBC800FAC8A5 /* SignUpOrSignInView.swift */; };
@@ -58,6 +66,14 @@
 		3E3948F32CA514A00068F225 /* EcoVis_Data_CollectionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoVis_Data_CollectionUITests.swift; sourceTree = "<group>"; };
 		3E3948F52CA514A00068F225 /* EcoVis_Data_CollectionUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoVis_Data_CollectionUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		5FA9FD952D16C7CB007A75DB /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		5FC148502DCB2A3000B3C1E5 /* ImageOverlapChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlapChecker.swift; sourceTree = "<group>"; };
+		5FC148522DCB2A4900B3C1E5 /* ImageOverlapTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlapTest.swift; sourceTree = "<group>"; };
+		5FC148542DCB2A5E00B3C1E5 /* ModeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeSelectionView.swift; sourceTree = "<group>"; };
+		5FC148562DCB2A6D00B3C1E5 /* RegionEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionEditView.swift; sourceTree = "<group>"; };
+		5FC148582DCB2A9900B3C1E5 /* RegionSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionSelectorView.swift; sourceTree = "<group>"; };
+		5FC1485A2DCB2AAD00B3C1E5 /* RowModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowModeView.swift; sourceTree = "<group>"; };
+		5FC1485C2DCB2AC800B3C1E5 /* SavedImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedImagesView.swift; sourceTree = "<group>"; };
+		5FC1485E2DCB2AD800B3C1E5 /* SavedRowObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRowObjects.swift; sourceTree = "<group>"; };
 		5FE27CAC2D16CBA500FAC8A5 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		5FE27CAE2D16CBBB00FAC8A5 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		5FE27CB02D16CBC800FAC8A5 /* SignUpOrSignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpOrSignInView.swift; sourceTree = "<group>"; };
@@ -116,6 +132,14 @@
 		3E3948D72CA5149F0068F225 /* EcoVis Data Collection */ = {
 			isa = PBXGroup;
 			children = (
+				5FC1485E2DCB2AD800B3C1E5 /* SavedRowObjects.swift */,
+				5FC1485C2DCB2AC800B3C1E5 /* SavedImagesView.swift */,
+				5FC1485A2DCB2AAD00B3C1E5 /* RowModeView.swift */,
+				5FC148582DCB2A9900B3C1E5 /* RegionSelectorView.swift */,
+				5FC148562DCB2A6D00B3C1E5 /* RegionEditView.swift */,
+				5FC148542DCB2A5E00B3C1E5 /* ModeSelectionView.swift */,
+				5FC148522DCB2A4900B3C1E5 /* ImageOverlapTest.swift */,
+				5FC148502DCB2A3000B3C1E5 /* ImageOverlapChecker.swift */,
 				5FE27CB02D16CBC800FAC8A5 /* SignUpOrSignInView.swift */,
 				5FE27CAE2D16CBBB00FAC8A5 /* SignInView.swift */,
 				5FE27CAC2D16CBA500FAC8A5 /* SignUpView.swift */,
@@ -297,13 +321,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				5FE27CAF2D16CBBD00FAC8A5 /* SignInView.swift in Sources */,
+				5FC1485D2DCB2ACB00B3C1E5 /* SavedImagesView.swift in Sources */,
 				3E2E51AC2CC2265600932E7B /* CameraView.swift in Sources */,
 				5FE27CAD2D16CBA900FAC8A5 /* SignUpView.swift in Sources */,
+				5FC148552DCB2A6100B3C1E5 /* ModeSelectionView.swift in Sources */,
+				5FC1485F2DCB2AE000B3C1E5 /* SavedRowObjects.swift in Sources */,
+				5FC148572DCB2A7000B3C1E5 /* RegionEditView.swift in Sources */,
 				3E2A51142CD8AA0200AD3CAF /* ImageQualityChecker.swift in Sources */,
+				5FC148512DCB2A3600B3C1E5 /* ImageOverlapChecker.swift in Sources */,
 				5FE27CB12D16CBCE00FAC8A5 /* SignUpOrSignInView.swift in Sources */,
+				5FC1485B2DCB2AB300B3C1E5 /* RowModeView.swift in Sources */,
 				3E3948DB2CA5149F0068F225 /* ContentView.swift in Sources */,
+				5FC148532DCB2A4F00B3C1E5 /* ImageOverlapTest.swift in Sources */,
 				3E3948D92CA5149F0068F225 /* EcoVis_Data_CollectionApp.swift in Sources */,
 				3E18D9242D3F692800467746 /* DataHandler.swift in Sources */,
+				5FC148592DCB2A9D00B3C1E5 /* RegionSelectorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -467,6 +499,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"EcoVis Data Collection/Preview Content\"";
+				DEVELOPMENT_TEAM = 54P48ST2S6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "EcoVis-Data-Collection-Info.plist";
@@ -500,6 +533,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"EcoVis Data Collection/Preview Content\"";
+				DEVELOPMENT_TEAM = 54P48ST2S6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "EcoVis-Data-Collection-Info.plist";
