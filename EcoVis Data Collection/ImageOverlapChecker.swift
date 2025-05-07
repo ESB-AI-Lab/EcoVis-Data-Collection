@@ -2,7 +2,7 @@
 //  ImageOverlapChecker.swift
 //  EcoVis Data Collection
 //
-//  Created by Vats Narsaria on 12/28/24.
+//  Created by Aryaman Dayal on 5/6/25
 //
 
 import Accelerate
