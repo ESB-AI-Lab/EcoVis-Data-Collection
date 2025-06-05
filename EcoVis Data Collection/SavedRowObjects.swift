@@ -27,7 +27,14 @@ struct SavedRowObjectsView: View {
             }
             .navigationBarTitle("Saved Rows & Objects", displayMode: .inline)
             .navigationBarItems(
-                leading: Button("Done") { presentation.wrappedValue.dismiss() },
+                // ← Chevron back arrow to dismiss
+                leading: Button {
+                    presentation.wrappedValue.dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.blue)
+                },
+                // “Reset” stays on the right
                 trailing: Button("Reset") {
                     presentation.wrappedValue.dismiss()
                     onReset()
@@ -36,3 +43,5 @@ struct SavedRowObjectsView: View {
         }
     }
 }
+
+

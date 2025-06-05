@@ -4,39 +4,35 @@
 //
 //  Created by Aryaman Dayal on 3/11/25.
 //
+//
+
 
 import SwiftUI
 
 struct SavedImagesView: View {
-    let leftImages: [UIImage]
-    let rightImages: [UIImage]
+    let images: [UIImage]
     var onReset: () -> Void
-    
+
     @Environment(\.presentationMode) var presentationMode
-    
+
     var body: some View {
         NavigationView {
             List {
-                if !leftImages.isEmpty {
-                    Section(header: Text("Left Images")) {
-                        ForEach(leftImages.indices, id: \.self) { i in
-                            Image(uiImage: leftImages[i])
+                if !images.isEmpty {
+                    Section(header: Text("All Captured Images")) {
+                        ForEach(images.indices, id: \.self) { i in
+                            Image(uiImage: images[i])
                                 .resizable()
                                 .scaledToFit()
                         }
                     }
-                }
-                if !rightImages.isEmpty {
-                    Section(header: Text("Right Images")) {
-                        ForEach(rightImages.indices, id: \.self) { i in
-                            Image(uiImage: rightImages[i])
-                                .resizable()
-                                .scaledToFit()
-                        }
-                    }
+                } else {
+                    Text("No saved images.")
+                        .foregroundColor(.gray)
+                        .italic()
                 }
             }
-            .navigationBarTitle("All Captured Images", displayMode: .inline)
+            .navigationBarTitle("All Saved Images", displayMode: .inline)
             .navigationBarItems(
                 leading: Button("Done") {
                     presentationMode.wrappedValue.dismiss()
@@ -49,3 +45,4 @@ struct SavedImagesView: View {
         }
     }
 }
+
