@@ -35,12 +35,14 @@ struct RowModeView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
 
+
     @State private var savedData: [String: [UIImage]] = [:]
 
-    // — naming/upload —
     @State private var isNamingProject = false
     @State private var projectName = ""
     @State private var isUploading = false
+
+    @State private var showSavedImages = false
 
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
@@ -54,7 +56,13 @@ struct RowModeView: View {
                     .edgesIgnoringSafeArea(.all)
 
                 VStack(spacing: 16) {
-                    Text("Take a reference image from the left/right side of each object, and take photos rotating 180° toward the opposite side of the reference. Then, continue for the reverse side of each object in the same row, and repeat for each new row while pathing in a zig zag pattern. Keep object centered within the region you selected in the reference image in each proceeding image to ensure best overlap detection results.")
+                    Text("""
+                        Take a reference image from the left/right side of each object, and take photos rotating \
+                        180° toward the opposite side of the reference. Then, continue for the reverse side of \
+                        each object in the same row, and repeat for each new row while pathing in a zig zag \
+                        pattern. Keep object centered within the region you selected in the reference image in \
+                        each proceeding image to ensure best overlap detection results.
+                        """)
                         .font(.subheadline)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.blue)
@@ -138,6 +146,13 @@ struct RowModeView: View {
                             .foregroundColor(.blue)
                             .multilineTextAlignment(.center)
                             .padding(.top, 8)
+
+                        // new “View Saved Images” button
+                        Button("View Saved Images") {
+                            showSavedImages = true
+                        }
+                        .rowButtonStyle(color: .secondary)
+                        .padding(.top, 4)
                     }
 
                     if !feedbackMessage.isEmpty {
@@ -194,10 +209,17 @@ struct RowModeView: View {
                     }
                 }
             }
+            // → new sheet showing all savedData in list form
+            .sheet(isPresented: $showSavedImages) {
+                SavedRowObjectsView(
+                    savedData: savedData,
+                    onReset: resetAll
+                )
+            }
         }
     }
 
-    // MARK: – Helpers
+    // MARK: – Helper Views & Methods
 
     private func previewColumn(title: String, image: UIImage?) -> some View {
         VStack {
@@ -225,9 +247,6 @@ struct RowModeView: View {
     }
 
     private func startNewRow() {
-        if backside, referenceImage != nil, nextImage != nil {
-            saveCurrentBackside()
-        }
         rowStarted = true
         frontCount = 0
         currentObject = 1
@@ -256,7 +275,7 @@ struct RowModeView: View {
                 ? "Overlap Detected. Tap Next Object to save."
                 : "No overlap. Image will not be saved."
             borderColor = ok ? .green : .red
-            // We do NOT append nxt here; appending happens in newObjectPressed().
+            // We do NOT append `nxt` here; appending happens in newObjectPressed()
         }
     }
 
@@ -266,7 +285,6 @@ struct RowModeView: View {
             showErrorAlert = true
             return
         }
-        // Check overlap again before saving
         guard let region = selectedRegion, regionSelectionCompleted else {
             errorMessage = "No region selected."
             showErrorAlert = true
@@ -300,7 +318,7 @@ struct RowModeView: View {
     }
 
     private func reverseSidePressed() {
-        // Save the front side only if overlap is OK
+        // Save front side only if overlap ok
         if !backside,
            let ref = referenceImage,
            let nxt = nextImage,
@@ -368,9 +386,13 @@ struct RowModeView: View {
 
     private func uploadRowProject(named name: String) async {
         guard let uid = Clerk.shared.user?.id else {
-            feedbackMessage = "Missing user ID"; borderColor = .red; return
+            feedbackMessage = "Missing user ID"
+            borderColor = .red
+            return
         }
-        isUploading = true; feedbackMessage = "Uploading…"; borderColor = .clear
+        isUploading = true
+        feedbackMessage = "Uploading…"
+        borderColor = .clear
 
         let storageFolder = "users/\(uid)/projects/\(name)/rows"
         let projectDoc = db
@@ -378,27 +400,55 @@ struct RowModeView: View {
             .collection("projects").document(name)
 
         do {
+            // 1) Touch the parent document so it appears in History
+            try await projectDoc.setData([
+                "createdAt": FieldValue.serverTimestamp()
+            ], merge: true)
+
+            // 2) Upload each row’s images into subcollection “rows”
             for (key, images) in savedData {
                 let safeKey = key.replacingOccurrences(of: " ", with: "_")
                 var urls: [String] = []
+
                 for (i, img) in images.enumerated() {
                     if let data = img.jpegData(compressionQuality: 0.8) {
                         let imageRef = storage.reference()
                             .child("\(storageFolder)/\(safeKey)/\(i).jpg")
                         _ = try await imageRef.putDataAsync(data, metadata: nil)
-                        urls.append(try await imageRef.downloadURL().absoluteString)
+                        let downloadURL = try await imageRef.downloadURL()
+                        urls.append(downloadURL.absoluteString)
                     }
                 }
+
                 try await projectDoc
                     .collection("rows")
                     .document(safeKey)
                     .setData(["images": urls], merge: true)
             }
-            feedbackMessage = "Upload complete!"; borderColor = .green
+
+            feedbackMessage = "Upload complete!"
+            borderColor = .green
         } catch {
-            feedbackMessage = "Upload failed: \(error.localizedDescription)"; borderColor = .red
+            feedbackMessage = "Upload failed: \(error.localizedDescription)"
+            borderColor = .red
         }
         isUploading = false
+    }
+
+    // Reset everything, including savedData
+    private func resetAll() {
+        rowStarted = false
+        currentRow = 1
+        frontCount = 0
+        currentObject = 1
+        backside = false
+        referenceImage = nil
+        nextImage = nil
+        selectedRegion = nil
+        regionSelectionCompleted = false
+        feedbackMessage = ""
+        borderColor = .clear
+        savedData.removeAll()
     }
 }
 
@@ -414,4 +464,5 @@ private extension View {
             .cornerRadius(6)
     }
 }
+
 

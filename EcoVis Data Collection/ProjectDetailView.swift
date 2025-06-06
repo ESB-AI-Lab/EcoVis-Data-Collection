@@ -4,6 +4,8 @@
 //
 //  Created by Aryaman Dayal on 6/5/25.
 //
+//
+
 
 import SwiftUI
 import FirebaseFirestore
@@ -15,9 +17,7 @@ struct ProjectDetailView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     
-    // If objectModeURLs != nil, it’s an object project:
     @State private var objectModeURLs: [String]?
-    // If rowModeURLs != nil, it’s a row project:
     @State private var rowModeURLs: [String: [String]]?
     
     private let db = Firestore.firestore()
@@ -34,11 +34,9 @@ struct ProjectDetailView: View {
                     .padding()
             }
             else if let urls = objectModeURLs {
-                // Show object‐mode image list
                 RemoteSavedImagesView(imageURLs: urls)
             }
             else if let rows = rowModeURLs {
-                // Show row‐mode image list
                 RemoteSavedRowObjectsView(rowImageURLs: rows)
             }
             else {
@@ -80,12 +78,11 @@ struct ProjectDetailView: View {
                     return
                 }
                 
-                // Check if “objects” field exists
+                // Check if “objects” field exists (object mode)
                 if let objectURLs = data["objects"] as? [String] {
                     self.objectModeURLs = objectURLs
                     self.isLoading = false
-                }
-                else {
+                } else {
                     // Otherwise, treat as row mode: fetch subcollection “rows”
                     projectDocRef
                         .collection("rows")
@@ -93,16 +90,21 @@ struct ProjectDetailView: View {
                             DispatchQueue.main.async {
                                 if let rowError = rowError {
                                     self.errorMessage = rowError.localizedDescription
-                                } else if let docs = rowSnapshot?.documents, !docs.isEmpty {
-                                    var temp: [String: [String]] = [:]
+                                    self.isLoading = false
+                                    return
+                                }
+                                
+                                var temp: [String: [String]] = [:]
+                                if let docs = rowSnapshot?.documents {
                                     for doc in docs {
                                         let key = doc.documentID
                                         if let urls = doc.data()["images"] as? [String] {
                                             temp[key] = urls
                                         }
                                     }
-                                    self.rowModeURLs = temp
                                 }
+                                // Even if there are no documents, temp is set (possibly empty)
+                                self.rowModeURLs = temp
                                 self.isLoading = false
                             }
                         }
@@ -111,3 +113,4 @@ struct ProjectDetailView: View {
         }
     }
 }
+
