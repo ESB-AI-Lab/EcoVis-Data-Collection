@@ -5,7 +5,7 @@
 
 import SwiftUI
 import FirebaseFirestore
-import ClerkSDK
+import FirebaseAuth
 
 struct HistoryView: View {
     @State private var projectNames: [String] = []
@@ -42,7 +42,7 @@ struct HistoryView: View {
     }
     
     private func loadProjectNames() {
-        guard let uid = Clerk.shared.user?.id else {
+        guard let uid = Auth.auth().currentUser?.uid else {
             errorMessage = "Missing user ID."
             isLoading = false
             return

@@ -9,7 +9,7 @@
 import SwiftUI
 import FirebaseFirestore
 import FirebaseStorage
-import ClerkSDK
+import FirebaseAuth
 
 struct ContentView: View {
     @Binding var selectedMode: EcoVis_Data_CollectionApp.Mode?
@@ -320,7 +320,7 @@ struct ContentView: View {
 
     /// Uploads both reference + successful Next images under one “objects” folder
     private func uploadObjectProject(named name: String) async {
-        guard let uid = Clerk.shared.user?.id else {
+        guard let uid = Auth.auth().currentUser?.uid else {
             feedbackMessage = "Missing user ID"
             borderColor = .red
             return

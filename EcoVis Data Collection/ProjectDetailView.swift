@@ -9,7 +9,7 @@
 
 import SwiftUI
 import FirebaseFirestore
-import ClerkSDK
+import FirebaseAuth
 
 struct ProjectDetailView: View {
     let projectName: String
@@ -52,7 +52,7 @@ struct ProjectDetailView: View {
     }
     
     private func fetchProjectData() {
-        guard let uid = Clerk.shared.user?.id else {
+        guard let uid = Auth.auth().currentUser?.uid else {
             self.errorMessage = "Missing user ID."
             self.isLoading = false
             return

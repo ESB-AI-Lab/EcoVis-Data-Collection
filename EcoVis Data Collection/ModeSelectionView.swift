@@ -13,7 +13,7 @@
 //  Updated 2025-06 to center content vertically.
 
 import SwiftUI
-import ClerkSDK
+import FirebaseAuth
 
 struct ModeSelectionView: View {
     @Binding var selectedMode: EcoVis_Data_CollectionApp.Mode?
@@ -45,8 +45,11 @@ struct ModeSelectionView: View {
                     .modeButtonStyle(color: .orange)
 
                     Button("Log Out") {
-                        Task {
-                            try? await Clerk.shared.signOut()
+                        do {
+                            try Auth.auth().signOut()
+                            selectedMode = nil
+                        } catch {
+                            print("Error signing out: \(error.localizedDescription)")
                         }
                     }
                     .font(.subheadline)

@@ -8,7 +8,7 @@
 import SwiftUI
 import FirebaseFirestore
 import FirebaseStorage
-import ClerkSDK
+import FirebaseAuth
 
 struct RowModeView: View {
     @Binding var selectedMode: EcoVis_Data_CollectionApp.Mode?
@@ -385,7 +385,7 @@ struct RowModeView: View {
     // MARK: – Upload logic
 
     private func uploadRowProject(named name: String) async {
-        guard let uid = Clerk.shared.user?.id else {
+        guard let uid = Auth.auth().currentUser?.uid else {
             feedbackMessage = "Missing user ID"
             borderColor = .red
             return

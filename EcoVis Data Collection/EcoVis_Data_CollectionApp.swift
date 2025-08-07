@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import ClerkSDK
+import FirebaseAuth
 import FirebaseCore      // ← add
 
 /// 1) Create a minimal UIApplicationDelegate to configure Firebase
@@ -22,36 +22,32 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct EcoVis_Data_CollectionApp: App {
-    // 2) Hook your AppDelegate in
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
     enum Mode { case object, row }
     @State private var selectedMode: Mode? = nil
-    private var clerk = Clerk.shared
+    @State private var user: User? = Auth.auth().currentUser
 
     var body: some Scene {
         WindowGroup {
             ZStack {
-                if clerk.loadingState == .notLoaded {
-                    ProgressView()
-                } else if clerk.user == nil {
-                    SignUpOrSignInView()
+                if user == nil {
+                    GoogleSignInView()
                 } else if selectedMode == nil {
                     ModeSelectionView(selectedMode: $selectedMode)
                 } else {
                     switch selectedMode! {
-                      case .object:
+                    case .object:
                         ContentView(selectedMode: $selectedMode)
-                      case .row:
+                    case .row:
                         RowModeView(selectedMode: $selectedMode)
                     }
                 }
             }
-            .task {
-                clerk.configure(
-                  publishableKey: "pk_test_am9pbnQtcGVhY29jay02OC5jbGVyay5hY2NvdW50cy5kZXYk"
-                )
-                try? await clerk.load()
+            .onAppear {
+                Auth.auth().addStateDidChangeListener { _, currentUser in
+                    user = currentUser
+                }
             }
         }
     }
