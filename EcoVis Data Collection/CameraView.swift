@@ -45,7 +45,7 @@ struct CameraView: UIViewControllerRepresentable {
         //Create a new instance
         let picker = UIImagePickerController()
         //Set Coordinator to handle when a picture is taken
-        picker.delegate = /Users/kan/Documents/EcoVis-Data-Collection/EcoVis Data Collection/CameraView.swiftcontext.coordinator
+        picker.delegate = context.coordinator
         //Set source to camera
         picker.sourceType = .camera
         return picker
